@@ -10,6 +10,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.startupbus.location.service.GPSLoggerService;
+
 public class Logger extends Activity implements OnClickListener {
     private static final String TAG = "Logger";
     Button buttonStart, buttonStop;
@@ -30,17 +32,18 @@ public class Logger extends Activity implements OnClickListener {
     }
 
     public void onClick(View src) {
-	Intent intent=new Intent("com.startupbus.location.MyService");  
 	switch (src.getId()) {
 	case R.id.buttonStart:
 	    Log.d(TAG, "onClick: starting srvice");
-	    this.startService(intent);
+	    startService(new Intent(Logger.this,
+				    GPSLoggerService.class));
 	    debugArea.setText("Yeah");
 	    break;
 	case R.id.buttonStop:
 	    Log.d(TAG, "onClick: stopping srvice");
-	    this.stopService(intent);
-	    debugArea.setText("Noeh");
+	    stopService(new Intent(Logger.this,
+				   GPSLoggerService.class));
+   	    debugArea.setText("Noeh");
 	    break;
 	}
     }
