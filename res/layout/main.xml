@@ -7,18 +7,64 @@
   <ImageView
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
-      android:src="@drawable/sblogo" />
+      android:src="@drawable/sblogo"
+      android:padding="20dp" />
+  <!-- <TextView android:layout_width="fill_parent"  -->
+  <!--     android:layout_height="wrap_content" android:text="Logger"  -->
+  <!--     android:gravity="center" android:textSize="20sp"  -->
+  <!--     android:padding="20dp"/> -->
+
+    <!-- <TextView -->
+    <!--     android:layout_width="fill_parent" -->
+    <!--     android:layout_height="wrap_content" -->
+    <!--     android:layout_marginTop="12dip" -->
+    <!--     android:text="@string/bus_prompt"/> -->
+    <!-- <Spinner -->
+    <!--     android:id="@+id/spinner" -->
+    <!--     android:layout_width="fill_parent" -->
+    <!--     android:layout_height="wrap_content" -->
+    <!--     android:prompt="@string/bus_prompt"/> -->
+
+    <!-- <TextView -->
+    <!--     android:id="@+id/label" -->
+    <!--     android:layout_width="fill_parent" -->
+    <!--     android:layout_height="wrap_content" -->
+    <!--     android:text="SimpleGeo reference:"/> -->
+    <!-- <EditText -->
+    <!--     android:id="@+id/simplegeoref" -->
+    <!--     android:layout_width="fill_parent" -->
+    <!--     android:layout_height="wrap_content" -->
+    <!--     android:layout_below="@id/label"/> -->
+
   <TextView android:layout_width="fill_parent" 
-      android:layout_height="wrap_content" android:text="Logger" 
-      android:gravity="center" android:textSize="20sp" 
-      android:padding="20dp"/>
+      android:layout_height="wrap_content"
+      android:text="SimpleGeo layer" 
+      android:gravity="left"
+      android:textSize="14sp"
+      />
+  <EditText
+        android:id="@+id/sglayeredit"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+  	/>
+
   <Button android:layout_width="wrap_content" 
-	  android:layout_height="wrap_content" android:id="@+id/buttonStart" 
-	  android:text="Start"></Button>
+	  android:layout_height="wrap_content"
+	  android:id="@+id/buttonStart" 
+	  android:text="Start" />
+
   <Button android:layout_width="wrap_content" 
-	  android:layout_height="wrap_content" android:text="Stop" 
-	  android:id="@+id/buttonStop"></Button>
-  <TextView android:id="@+id/debug"
+	  android:layout_height="wrap_content"
+	  android:id="@+id/buttonStop"
+	  android:text="Stop"/>
+
+  <ToggleButton android:id="@+id/gpsToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textOn="Log on "
+        android:textOff="Log off" />
+
+  <TextView android:id="@+id/debugArea"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:text="" />

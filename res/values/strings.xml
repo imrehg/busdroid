@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Logger</string>
+
+    <string name="bus_prompt">Choose your bus</string>
+    <string-array name="bus_array">
+      <item>Chicago</item>
+      <item>Cleveland</item>
+      <item>Miami</item>
+      <item>New York</item>
+      <item>San Francisco</item>
+      <item>:: Other ::</item>
+    </string-array>
 </resources>
