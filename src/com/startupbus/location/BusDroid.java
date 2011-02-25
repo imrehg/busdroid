@@ -51,10 +51,10 @@ import android.content.SharedPreferences;
 import android.text.TextWatcher;
 
 
-public class Logger extends Activity implements OnClickListener {
+public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
 
-    private static final String TAG = "Logger";
+    private static final String TAG = "BusDroid";
     private LocationManager myManager;
     FeatureCollection collection;
     Button buttonStart, buttonStop;
@@ -67,7 +67,7 @@ public class Logger extends Activity implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.main);
-
+	
 	// Restore preferences
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 	String buslayer = settings.getString("BusLayer", "");
@@ -91,10 +91,10 @@ public class Logger extends Activity implements OnClickListener {
 		    if (gpstoggle.isChecked()) {
 			saveSettings();
 			startGPS();
-			Toast.makeText(Logger.this, "Checked", Toast.LENGTH_SHORT).show();
+			Toast.makeText(BusDroid.this, "Checked", Toast.LENGTH_SHORT).show();
 		    } else {
 			stopGPS();
-			Toast.makeText(Logger.this, "Not checked", Toast.LENGTH_SHORT).show();
+			Toast.makeText(BusDroid.this, "Not checked", Toast.LENGTH_SHORT).show();
 		    }
 		}
 	    });
@@ -139,7 +139,7 @@ public class Logger extends Activity implements OnClickListener {
 
 	String recordId = String.format("bus_%d", 1234);
 	String layer = "com.startupbus.test";
-	String rectype= "Feature";
+	String rectype= "Location";
 	Record update = new Record();
 
 	HashMap hm = new HashMap();
@@ -158,6 +158,16 @@ public class Logger extends Activity implements OnClickListener {
 	}
 	debugArea.setText(text);
 
+	ArrayList al = new ArrayList(); 
+	al.add(statusupdate);
+
+	// try {
+	//     client.addOrUpdateRecords(al, buslayer);
+	// } catch(IOException e) {
+	//     debugArea.setText("IO>"+e.getMessage()+"\n");
+	// } catch(JSONException e) {
+	//     debugArea.setText("JSON>"+e.getMessage()+"\n");
+	// }
 	
 	// // HashMap ret = new HashMap();
 	// try {
@@ -200,12 +210,12 @@ public class Logger extends Activity implements OnClickListener {
    //  }
 
     public void startGPS() {
-	startService(new Intent(Logger.this,
+	startService(new Intent(BusDroid.this,
 				GPSLoggerService.class));
     }
 
     public void stopGPS() {
-	stopService(new Intent(Logger.this,
+	stopService(new Intent(BusDroid.this,
 				GPSLoggerService.class));
     }
 
@@ -214,13 +224,13 @@ public class Logger extends Activity implements OnClickListener {
 	switch (src.getId()) {
 	case R.id.buttonStart:
 	    Log.d(TAG, "onClick: starting srvice");
-	    startService(new Intent(Logger.this,
+	    startService(new Intent(BusDroid.this,
 				    GPSLoggerService.class));
 	    debugArea.setText("Yeah");
 	    break;
 	case R.id.buttonStop:
 	    Log.d(TAG, "onClick: stopping srvice");
-	    stopService(new Intent(Logger.this,
+	    stopService(new Intent(BusDroid.this,
 				   GPSLoggerService.class));
    	    debugArea.setText("Noeh");
 	    break;
