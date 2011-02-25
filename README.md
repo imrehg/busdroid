@@ -5,7 +5,7 @@ Simple GPS location collector and forwarder service and UI.
 #### Develop
 
     ant debug
-    adb install -r bin/Logger-debug.apk
+    adb install -r bin/BusDroid-debug.apk
 
 #### Architecture
 
