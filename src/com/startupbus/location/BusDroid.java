@@ -14,6 +14,7 @@ import android.widget.ToggleButton;
 import android.widget.Toast;
 
 import com.startupbus.location.service.GPSLoggerService;
+import com.startupbus.location.service.SGUpdateService;
 
 import com.simplegeo.client.SimpleGeoPlacesClient;
 import com.simplegeo.client.SimpleGeoStorageClient;
@@ -61,7 +62,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Restore preferences
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 	String buslayer = settings.getString("BusLayer", "");
-	Long refreshinterval = settings.getLong("RefreshInterval", 1);
+	refreshinterval = settings.getLong("RefreshInterval", 1);
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
@@ -74,94 +75,97 @@ public class BusDroid extends Activity implements OnClickListener {
 	buttonStart.setOnClickListener(this);
 	buttonStop.setOnClickListener(this);
 
-	// LocationManager locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-	myManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
-	Location l = myManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-	if (l == null) {
-	    // Fall back to coarse location.
-	    l = myManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-	}
-	// Start with fine location.
-	// Location l = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	// // LocationManager locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	// myManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
+	// Location l = myManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 	// if (l == null) {
 	//     // Fall back to coarse location.
-	//     l = locator.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+	//     l = myManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 	// }
-	// // locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE); Location location = locationManager.getCurrentLocation("gps");
-
-	SimpleGeoStorageClient client = SimpleGeoStorageClient.getInstance();
-	client.getHttpClient().setToken("CrQ8RDznnjEhwUCGn5Uv9G3h9kR4xcLK", "MtLzaKmMP8C2DfYBDWUemZ6pRLZQe2cT");
-
-	Point loc = new Point(l.getLatitude(), l.getLongitude());
-	// debugArea.setText(String.format("Last location:\n%.7f, %.7f\n(from %s)",
-	// 				loc.getLat(),
-	// 				loc.getLon(),
-	// 				l.getProvider()
-	// 				)
-	// 		  );
-	// // try {
-	// //     collection = client.search(37.7787, -122.3896, "",  "", 25.0);
-	// // } catch (IOException e) {
-	// //     debugArea.setText(e.getMessage());
+	// // Start with fine location.
+	// // Location l = locator.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	// // if (l == null) {
+	// //     // Fall back to coarse location.
+	// //     l = locator.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 	// // }
+	// // // locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE); Location location = locationManager.getCurrentLocation("gps");
+
+	// SimpleGeoStorageClient client = SimpleGeoStorageClient.getInstance();
+	// client.getHttpClient().setToken("CrQ8RDznnjEhwUCGn5Uv9G3h9kR4xcLK", "MtLzaKmMP8C2DfYBDWUemZ6pRLZQe2cT");
+
+	// Point loc = new Point(l.getLatitude(), l.getLongitude());
+	// // debugArea.setText(String.format("Last location:\n%.7f, %.7f\n(from %s)",
+	// // 				loc.getLat(),
+	// // 				loc.getLon(),
+	// // 				l.getProvider()
+	// // 				)
+	// // 		  );
+	// // // try {
+	// // //     collection = client.search(37.7787, -122.3896, "",  "", 25.0);
+	// // // } catch (IOException e) {
+	// // //     debugArea.setText(e.getMessage());
+	// // // }
+	// // String text = "";
+	// // // try {
+	// // //     text = collection.toJSONString();
+	// // // } catch(JSONException e) {
+	// // //     debugArea.setText(e.getMessage());
+	// // // }
+
+
+	// String recordId = String.format("bus_%d", 1234);
+	// String layer = "com.startupbus.test";
+	// String rectype= "Location";
+	// Record update = new Record();
+
+	// HashMap hm = new HashMap();
+	// hm.put("testing", true);
+	// Record statusupdate = new Record(recordId, layer, rectype, loc.getLon(), loc.getLat());
+
+	// // newplace.setGeometry(new Geometry(loc));
+	// // newplace.setType("StartupBusTest01");
+	// // newplace.setProperties(hm);
+	// // newplace.setSimpleGeoId("ABC");
 	// String text = "";
+	// try {
+	//     text = statusupdate.toJSONString();
+	// } catch(JSONException e) {
+	//     debugArea.setText(e.getMessage());
+	// }
+	// debugArea.setText(text);
+
+	// ArrayList al = new ArrayList(); 
+	// al.add(statusupdate);
+
 	// // try {
-	// //     text = collection.toJSONString();
+	// //     client.addOrUpdateRecords(al, buslayer);
+	// // } catch(IOException e) {
+	// //     debugArea.setText("IO>"+e.getMessage()+"\n");
 	// // } catch(JSONException e) {
-	// //     debugArea.setText(e.getMessage());
+	// //     debugArea.setText("JSON>"+e.getMessage()+"\n");
 	// // }
-
-
-	String recordId = String.format("bus_%d", 1234);
-	String layer = "com.startupbus.test";
-	String rectype= "Location";
-	Record update = new Record();
-
-	HashMap hm = new HashMap();
-	hm.put("testing", true);
-	Record statusupdate = new Record(recordId, layer, rectype, loc.getLon(), loc.getLat());
-
-	// newplace.setGeometry(new Geometry(loc));
-	// newplace.setType("StartupBusTest01");
-	// newplace.setProperties(hm);
-	// newplace.setSimpleGeoId("ABC");
-	String text = "";
-	try {
-	    text = statusupdate.toJSONString();
-	} catch(JSONException e) {
-	    debugArea.setText(e.getMessage());
-	}
-	debugArea.setText(text);
-
-	ArrayList al = new ArrayList(); 
-	al.add(statusupdate);
-
-	// try {
-	//     client.addOrUpdateRecords(al, buslayer);
-	// } catch(IOException e) {
-	//     debugArea.setText("IO>"+e.getMessage()+"\n");
-	// } catch(JSONException e) {
-	//     debugArea.setText("JSON>"+e.getMessage()+"\n");
-	// }
 	
-	// // HashMap ret = new HashMap();
-	// try {
-	//     client.addOrUpdateRecord(statusupdate);
-	// } catch(IOException e) {
-	//     debugArea.setText("IO>"+e.getMessage()+"\n");
-	// } catch(JSONException e) {
-	//     debugArea.setText("JSON>"+e.getMessage()+"\n");
-	// }
-
-	// // Set set = ret.entrySet();
-	// // Iterator i = set.iterator();
-	// // while(i.hasNext()){
-	// //     Map.Entry me = (Map.Entry)i.next();
-	// //     debugArea.append(">"+me.getKey() + "< : " + me.getValue() );
+	// // // HashMap ret = new HashMap();
+	// // try {
+	// //     client.addOrUpdateRecord(statusupdate);
+	// // } catch(IOException e) {
+	// //     debugArea.setText("IO>"+e.getMessage()+"\n");
+	// // } catch(JSONException e) {
+	// //     debugArea.setText("JSON>"+e.getMessage()+"\n");
 	// // }
+
+	// // // Set set = ret.entrySet();
+	// // // Iterator i = set.iterator();
+	// // // while(i.hasNext()){
+	// // //     Map.Entry me = (Map.Entry)i.next();
+	// // //     debugArea.append(">"+me.getKey() + "< : " + me.getValue() );
+	// // // }
 	
     }
 
+    /*
+     * GPS logging related service
+     */
     public void startGPS() {
 	startService(new Intent(BusDroid.this,
 				GPSLoggerService.class));
@@ -172,14 +176,29 @@ public class BusDroid extends Activity implements OnClickListener {
 				GPSLoggerService.class));
     }
 
+    /*
+     * Net related service
+     */
+    public void startNetUpdate() {
+    	startService(new Intent(BusDroid.this,
+    				SGUpdateService.class));
+    }
+
+    public void stopNetUpdate() {
+    	stopService(new Intent(BusDroid.this,
+    				SGUpdateService.class));
+    }
+
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
 	    startGPS();
+	    // startNetUpdate();
 	    debugArea.setText("Yeah");
 	    break;
 	case R.id.buttonStop:
-	    stopGPS;
+	    stopGPS();
+	    // stopNetUpdate();
    	    debugArea.setText("Noeh");
 	    break;
 

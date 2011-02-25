@@ -12,7 +12,11 @@
       </intent-filter>
     </activity>
     <service android:name=".service.GPSLoggerService"
-	     android:label="Bus GPS" android:exported="true"
+	     android:label="Bus GPS Logger" android:exported="true"
+	     android:enabled="true">
+    </service>
+    <service android:name=".service.SGUpdateService"
+	     android:label="Bus SimpleGeo Updater" android:exported="true"
 	     android:enabled="true">
     </service>
   </application>

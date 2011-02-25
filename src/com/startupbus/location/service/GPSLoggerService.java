@@ -29,6 +29,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import android.content.SharedPreferences;
+import com.startupbus.location.service.SGUpdateService;
 
 public class GPSLoggerService extends Service {
 
@@ -53,7 +54,8 @@ public class GPSLoggerService extends Service {
     private static final String tag = "GPSLoggerService";
 
     public static final String PREFS_NAME = "BusdroidPrefs";
-
+    Long lastrefresh;
+    Long refreshinterval;
 
     String param = "";
 
@@ -89,7 +91,8 @@ public class GPSLoggerService extends Service {
     public class MyLocationListener implements LocationListener {
 
 	public void onLocationChanged(Location loc) {
-	    if (loc != null) {
+	    long now = (long) (System.currentTimeMillis() / 1000L);
+	    if ((loc != null) && (now > (lastrefresh + refreshinterval))) {
 		boolean pointIsRecorded = false;
 		try {
 		    if (loc.hasAccuracy() && loc.getAccuracy() <= minAccuracyMeters) {
@@ -119,6 +122,11 @@ public class GPSLoggerService extends Service {
 			db.close();
 		}
 		if (pointIsRecorded) {
+		    long elapsed = now - lastrefresh;
+		    Toast.makeText(getBaseContext(),
+				   String.format("Elapsed: %d", elapsed),
+				   Toast.LENGTH_SHORT).show();
+		    lastrefresh = now;
 		    if (showingDebugToast) Toast.makeText(
 							  getBaseContext(),
 							  "Location stored: \nLat: " + sevenSigDigits.format(loc.getLatitude())
@@ -172,6 +180,11 @@ public class GPSLoggerService extends Service {
 
     private NotificationManager mNM;
 
+    // This is the object that receives interactions from clients. See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new LocalBinder();
+    
+
     @Override
     public void onCreate() {
 	super.onCreate();
@@ -179,27 +192,40 @@ public class GPSLoggerService extends Service {
 
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 	String buslayer = settings.getString("BusLayer", "");
-	Toast.makeText(getBaseContext(), "Layer: " + buslayer, Toast.LENGTH_SHORT).show();
+	refreshinterval = settings.getLong("RefreshInterval", 1) * 60L;
+	lastrefresh = 0L;
+	// Toast.makeText(getBaseContext(), "Layer: " + buslayer, Toast.LENGTH_SHORT).show();
+	Toast.makeText(getBaseContext(),
+		       String.format("Refresh: %d", refreshinterval),
+		       Toast.LENGTH_SHORT).show();
+	
 	startLoggerService();
 
 	// Display a notification about us starting. We put an icon in the
 	// status bar.
 	showNotification();
+	// startNetUpdate();
+
     }
 
     @Override
     public void onDestroy() {
 	super.onDestroy();
+	// stopNetUpdate();
+	shutdownLoggerService();
 
-		shutdownLoggerService();
+    }
+    
+    // public void startNetUpdate() {
+    // 	startService(new Intent(GPSLoggerService.this,
+    // 				SGUpdateService.class));
+    // }
 
-		// // Cancel the persistent notification.
-		// mNM.cancel(R.string.local_service_started);
+    // public void stopNetUpdate() {
+    // 	stopService(new Intent(GPSLoggerService.this,
+    // 				SGUpdateService.class));
+    // }
 
-		// // Tell the user we stopped.
-		// Toast.makeText(this, R.string.local_service_stopped,
-		// 				Toast.LENGTH_SHORT).show();
-	}
 
     private void updateParams(String newstring) {
 	Toast.makeText(this, param+newstring, Toast.LENGTH_SHORT).show();
@@ -233,12 +259,9 @@ public class GPSLoggerService extends Service {
 	// mNM.notify(R.string.local_service_started, notification);
     }
 
-    // This is the object that receives interactions from clients. See
-    // RemoteService for a more complete example.
-    private final IBinder mBinder = new LocalBinder();
 
     @Override
-	public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent) {
 	return mBinder;
     }
 
