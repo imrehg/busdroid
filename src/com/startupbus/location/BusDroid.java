@@ -24,16 +24,7 @@ import com.simplegeo.client.types.Point;
 import com.simplegeo.client.types.Geometry;
 import com.simplegeo.client.types.Record;
 
-// import com.simplegeo.android.cache.CommitLog;
 import com.simplegeo.client.handler.GeoJSONHandler;
-// import com.simplegeo.client.encoder.GeoJSONEncoder;
-// import com.simplegeo.client.geojson.GeoJSONObject;
-// import com.simplegeo.client.model.DefaultRecord;
-// import com.simplegeo.client.model.GeoJSONRecord;
-// import com.simplegeo.client.model.IRecord;
-// import com.simplegeo.client.model.Region;
-
-// import com.android.location.LocationManager;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -53,14 +44,14 @@ import android.text.TextWatcher;
 
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
-
     private static final String TAG = "BusDroid";
+
     private LocationManager myManager;
-    FeatureCollection collection;
     Button buttonStart, buttonStop;
     TextView debugArea;
     EditText sglayeredit;
     String buslayer;
+    Long refreshinterval;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +61,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Restore preferences
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 	String buslayer = settings.getString("BusLayer", "");
+	Long refreshinterval = settings.getLong("RefreshInterval", 1);
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
@@ -170,28 +162,6 @@ public class BusDroid extends Activity implements OnClickListener {
 	
     }
 
-   // class MyData {
-   //      public MyData( String spinnerText, String value ) {
-   //          this.spinnerText = spinnerText;
-   //          this.value = value;
-   //      }
-
-   //      public String getSpinnerText() {
-   //          return spinnerText;
-   //      }
-
-   //      public String getValue() {
-   //          return value;
-   //      }
-
-   //      public String toString() {
-   //          return spinnerText;
-   //      }
-
-   //      String spinnerText;
-   //      String value;
-   //  }
-
     public void startGPS() {
 	startService(new Intent(BusDroid.this,
 				GPSLoggerService.class));
@@ -202,19 +172,14 @@ public class BusDroid extends Activity implements OnClickListener {
 				GPSLoggerService.class));
     }
 
-
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
-	    Log.d(TAG, "onClick: starting srvice");
-	    startService(new Intent(BusDroid.this,
-				    GPSLoggerService.class));
+	    startGPS();
 	    debugArea.setText("Yeah");
 	    break;
 	case R.id.buttonStop:
-	    Log.d(TAG, "onClick: stopping srvice");
-	    stopService(new Intent(BusDroid.this,
-				   GPSLoggerService.class));
+	    stopGPS;
    	    debugArea.setText("Noeh");
 	    break;
 
@@ -231,7 +196,8 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Name of bus' layer on SimpleGeo
 	buslayer = sglayeredit.getText().toString();
 	editor.putString("BusLayer", buslayer);
-	
+	editor.putLong("RefreshInterval", refreshinterval);
+
 	// Commit the edits!
 	editor.commit();	
     }

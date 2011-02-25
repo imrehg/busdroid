@@ -40,6 +40,6 @@
       />
   <TextView android:id="@+id/debugArea"
 	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
+	    android:layout_height="fill_parent"
 	    android:text="" />
 </LinearLayout>
