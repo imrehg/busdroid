@@ -9,32 +9,6 @@
       android:layout_width="wrap_content"
       android:src="@drawable/sblogo"
       android:padding="20dp" />
-  <!-- <TextView android:layout_width="fill_parent"  -->
-  <!--     android:layout_height="wrap_content" android:text="Logger"  -->
-  <!--     android:gravity="center" android:textSize="20sp"  -->
-  <!--     android:padding="20dp"/> -->
-
-    <!-- <TextView -->
-    <!--     android:layout_width="fill_parent" -->
-    <!--     android:layout_height="wrap_content" -->
-    <!--     android:layout_marginTop="12dip" -->
-    <!--     android:text="@string/bus_prompt"/> -->
-    <!-- <Spinner -->
-    <!--     android:id="@+id/spinner" -->
-    <!--     android:layout_width="fill_parent" -->
-    <!--     android:layout_height="wrap_content" -->
-    <!--     android:prompt="@string/bus_prompt"/> -->
-
-    <!-- <TextView -->
-    <!--     android:id="@+id/label" -->
-    <!--     android:layout_width="fill_parent" -->
-    <!--     android:layout_height="wrap_content" -->
-    <!--     android:text="SimpleGeo reference:"/> -->
-    <!-- <EditText -->
-    <!--     android:id="@+id/simplegeoref" -->
-    <!--     android:layout_width="fill_parent" -->
-    <!--     android:layout_height="wrap_content" -->
-    <!--     android:layout_below="@id/label"/> -->
 
   <TextView android:layout_width="fill_parent" 
       android:layout_height="wrap_content"
@@ -58,12 +32,12 @@
 	  android:id="@+id/buttonStop"
 	  android:text="Stop"/>
 
-  <ToggleButton android:id="@+id/gpsToggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textOn="Log on "
-        android:textOff="Log off" />
-
+  <TextView android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:text="Debug messages:"
+      android:gravity="left"
+      android:textSize="14sp"
+      />
   <TextView android:id="@+id/debugArea"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"

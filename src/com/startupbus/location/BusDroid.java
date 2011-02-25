@@ -61,7 +61,6 @@ public class BusDroid extends Activity implements OnClickListener {
     TextView debugArea;
     EditText sglayeredit;
     String buslayer;
-    ToggleButton gpstoggle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,22 +81,6 @@ public class BusDroid extends Activity implements OnClickListener {
 
 	buttonStart.setOnClickListener(this);
 	buttonStop.setOnClickListener(this);
-
-	// Todo: set start state depending on whether service is running
-	gpstoggle = (ToggleButton) findViewById(R.id.gpsToggle);
-	gpstoggle.setOnClickListener(new OnClickListener() {
-		public void onClick(View v) {
-		    // Perform action on clicks
-		    if (gpstoggle.isChecked()) {
-			saveSettings();
-			startGPS();
-			Toast.makeText(BusDroid.this, "Checked", Toast.LENGTH_SHORT).show();
-		    } else {
-			stopGPS();
-			Toast.makeText(BusDroid.this, "Not checked", Toast.LENGTH_SHORT).show();
-		    }
-		}
-	    });
 
 	// LocationManager locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	myManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
@@ -234,9 +217,7 @@ public class BusDroid extends Activity implements OnClickListener {
 				   GPSLoggerService.class));
    	    debugArea.setText("Noeh");
 	    break;
-	case R.id.gpsToggle:
-	    debugArea.setText(sglayeredit.getText().toString());
-	    break;
+
 	}
 
     }
