@@ -290,7 +290,8 @@ public class BusDroid extends Activity implements OnClickListener {
 
        String provider = Settings.Secure.getString(getContentResolver(),
 						   Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-       if (provider.equals("gps")) {
+       Log.i(tag, provider);
+       if (provider.indexOf("gps") >= 0) {
 	   Toast.makeText(BusDroid.this, "GPS Enabled: " + provider,
 			  Toast.LENGTH_LONG).show();
        }else{
