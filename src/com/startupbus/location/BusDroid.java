@@ -54,7 +54,7 @@ import android.provider.Settings;
 
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
-    private static final String TAG = "BusDroid";
+    private static final String tag = "BusDroid:Main";
 
     public static final String DATABASE_NAME = "GPSLOGGERDB";
     public static final String POINTS_TABLE_NAME = "LOCATION_POINTS";
