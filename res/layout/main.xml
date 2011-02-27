@@ -12,7 +12,7 @@
 
   <TextView android:layout_width="fill_parent" 
       android:layout_height="wrap_content"
-      android:text="SimpleGeo layer" 
+      android:text="Bus city:"
       android:gravity="left"
       android:textSize="14sp"
       />

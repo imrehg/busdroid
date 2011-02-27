@@ -174,15 +174,9 @@ public class GPSLoggerService extends Service {
     public void startNetUpdate() {
     	startService(new Intent(GPSLoggerService.this,
     				NetUpdateService.class));
-	Toast.makeText(getBaseContext(),
-		       "StartNet - from GPS",
-		       Toast.LENGTH_SHORT).show();
     }
 
     public void stopNetUpdate() {
-	Toast.makeText(getBaseContext(),
-		       "Stop Net - from GPS",
-		       Toast.LENGTH_SHORT).show();
     	stopService(new Intent(GPSLoggerService.this,
     				NetUpdateService.class));
     }
@@ -201,28 +195,16 @@ public class GPSLoggerService extends Service {
 	super.onCreate();
 	mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	String buslayer = settings.getString("BusLayer", "");
-	// refreshinterval = settings.getLong("RefreshInterval", 1) * 60L;
-	// lastrefresh = 0L;
-	Toast.makeText(getBaseContext(), "Layer: " + buslayer, Toast.LENGTH_SHORT).show();
-	// Toast.makeText(getBaseContext(),
-	// 	       String.format("Refresh: %d", refreshinterval),
-	// 	       Toast.LENGTH_SHORT).show();
-	
 	startLoggerService();
 
-	// Display a notification about us starting. We put an icon in the
-	// status bar.
 	showNotification();
-	// startNetUpdate();
+
 	startNetUpdate();
     }
 
     @Override
     public void onDestroy() {
 	super.onDestroy();
-	// stopNetUpdate();
 	stopNetUpdate();
 	shutdownLoggerService();
     }

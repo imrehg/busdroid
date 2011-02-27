@@ -50,6 +50,7 @@ import org.json.JSONArray;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 
+import android.provider.Settings;
 
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
@@ -62,8 +63,7 @@ public class BusDroid extends Activity implements OnClickListener {
     Button buttonStart, buttonStop;
     TextView debugArea;
     EditText sglayeredit;
-    String buslayer;
-    Long refreshinterval;
+    String bus_id;
 
     final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
@@ -76,8 +76,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	
 	// Restore preferences
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	String buslayer = settings.getString("BusLayer", "");
-	refreshinterval = settings.getLong("RefreshInterval", 1);
+	String bus_id = settings.getString("bus_id", "Test");
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
@@ -85,7 +84,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	debugArea = (TextView) findViewById(R.id.debugArea);
 
 	sglayeredit = (EditText) findViewById(R.id.sglayeredit);
-	sglayeredit.setText(buslayer);
+	sglayeredit.setText(bus_id);
 
 	buttonStart.setOnClickListener(this);
 	buttonStop.setOnClickListener(this);
@@ -243,16 +242,17 @@ public class BusDroid extends Activity implements OnClickListener {
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
-	    // TEMPORARY
+	    saveSettings();
+	    CheckEnableGPS();
 	    startGPS();
 	    // startNetUpdate();
-	    // debugArea.setText("Yeah");
+	    debugArea.setText("On the roll");
 	    // getLastLoc();
 	    break;
 	case R.id.buttonStop:
 	    stopGPS();
 	    // stopNetUpdate();
-   	    debugArea.setText("Noeh");
+   	    debugArea.setText("No more rolling");
 	    break;
 
 	}
@@ -265,10 +265,15 @@ public class BusDroid extends Activity implements OnClickListener {
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 	SharedPreferences.Editor editor = settings.edit();
 
-	// Name of bus' layer on SimpleGeo
-	buslayer = sglayeredit.getText().toString();
-	editor.putString("BusLayer", buslayer);
-	editor.putLong("RefreshInterval", refreshinterval);
+	// If the city name is changed, ignore all previous points when
+	// checking for new locations
+	long now = (long) (System.currentTimeMillis() / 1000L);
+	editor.putLong("last_update", now);
+
+
+	// Name of bus in Database
+	bus_id = sglayeredit.getText().toString();
+	editor.putString("bus_id", bus_id);
 
 	// Commit the edits!
 	editor.commit();	
@@ -278,5 +283,22 @@ public class BusDroid extends Activity implements OnClickListener {
 	super.onStop();
 	saveSettings();
     }
+
+
+   private void CheckEnableGPS(){
+       // Check GPS settings and prompt if GPS satellite access  is not enabled
+
+       String provider = Settings.Secure.getString(getContentResolver(),
+						   Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+       if (provider.equals("gps")) {
+	   Toast.makeText(BusDroid.this, "GPS Enabled: " + provider,
+			  Toast.LENGTH_LONG).show();
+       }else{
+	   Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+	   startActivity(intent);
+	   Toast.makeText(BusDroid.this, "Please enable GPS satellites",
+			  Toast.LENGTH_LONG).show();
+       }   
+   }
 
 }
