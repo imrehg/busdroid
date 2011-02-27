@@ -14,18 +14,18 @@ import android.widget.ToggleButton;
 import android.widget.Toast;
 
 import com.startupbus.location.service.GPSLoggerService;
-import com.startupbus.location.service.SGUpdateService;
+import com.startupbus.location.service.NetUpdateService;
 
-import com.simplegeo.client.SimpleGeoPlacesClient;
-import com.simplegeo.client.SimpleGeoStorageClient;
-import com.simplegeo.client.callbacks.FeatureCollectionCallback;
-import com.simplegeo.client.types.Feature;
-import com.simplegeo.client.types.FeatureCollection;
-import com.simplegeo.client.types.Point;
-import com.simplegeo.client.types.Geometry;
-import com.simplegeo.client.types.Record;
+// import com.simplegeo.client.SimpleGeoPlacesClient;
+// import com.simplegeo.client.SimpleGeoStorageClient;
+// import com.simplegeo.client.callbacks.FeatureCollectionCallback;
+// import com.simplegeo.client.types.Feature;
+// import com.simplegeo.client.types.FeatureCollection;
+// import com.simplegeo.client.types.Point;
+// import com.simplegeo.client.types.Geometry;
+// import com.simplegeo.client.types.Record;
 
-import com.simplegeo.client.handler.GeoJSONHandler;
+// import com.simplegeo.client.handler.GeoJSONHandler;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -42,6 +42,11 @@ import android.widget.Spinner;
 import android.content.SharedPreferences;
 import android.text.TextWatcher;
 
+import com.cleardb.app.ClearDBQueryException;
+import com.cleardb.app.Client;
+import org.json.JSONObject;
+import org.json.JSONArray;
+
 
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
@@ -53,6 +58,10 @@ public class BusDroid extends Activity implements OnClickListener {
     EditText sglayeredit;
     String buslayer;
     Long refreshinterval;
+
+    final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
+    final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -163,6 +172,34 @@ public class BusDroid extends Activity implements OnClickListener {
 	
     }
 
+    public void testData() {
+	debugArea.append("Start query");
+	com.cleardb.app.Client cleardbClient = new com.cleardb.app.Client(API_KEY, APP_ID);
+	JSONObject payload = null;
+	try {
+	    payload = cleardbClient.query("SELECT longitude, latitude, timestamp FROM startupbus WHERE bus_id = 'San Francisco'");
+	} catch (ClearDBQueryException e) {
+	    debugArea.append("ClearDB error");
+	} catch (Exception e) {
+	    debugArea.append("Some errror..");
+	}
+	
+	if (payload != null) {
+	    try {
+		debugArea.append(payload.getString("response"));
+	    } catch (JSONException e) {
+		debugArea.append("Json decoding error");
+	    }
+	}
+	// for (JSONObject row : payload.getArray("response")) {
+	//     debugArea.append(String.format("at : %.7f, %.7f",
+	// 				row.getDouble("longitude"),
+	// 				row.getDouble("latitude")
+	// 				   ));
+	// }
+
+    }
+
     /*
      * GPS logging related service
      */
@@ -181,24 +218,24 @@ public class BusDroid extends Activity implements OnClickListener {
      */
     public void startNetUpdate() {
     	startService(new Intent(BusDroid.this,
-    				SGUpdateService.class));
+    				NetUpdateService.class));
     }
 
     public void stopNetUpdate() {
     	stopService(new Intent(BusDroid.this,
-    				SGUpdateService.class));
+    				NetUpdateService.class));
     }
 
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
 	    startGPS();
-	    // startNetUpdate();
+	    startNetUpdate();
 	    debugArea.setText("Yeah");
 	    break;
 	case R.id.buttonStop:
 	    stopGPS();
-	    // stopNetUpdate();
+	    stopNetUpdate();
    	    debugArea.setText("Noeh");
 	    break;
 

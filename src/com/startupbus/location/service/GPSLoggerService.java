@@ -54,8 +54,6 @@ public class GPSLoggerService extends Service {
     private static final String tag = "GPSLoggerService";
 
     public static final String PREFS_NAME = "BusdroidPrefs";
-    Long lastrefresh;
-    Long refreshinterval;
 
     String param = "";
 
@@ -78,7 +76,7 @@ public class GPSLoggerService extends Service {
     private void initDatabase() {
 	db = this.openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READWRITE, null);
 	db.execSQL("CREATE TABLE IF NOT EXISTS " +
-		   POINTS_TABLE_NAME + " (GMTTIMESTAMP VARCHAR, LATITUDE REAL, LONGITUDE REAL," +
+		   POINTS_TABLE_NAME + " (GMTTIMESTAMP VARCHAR, TIMESTAMP REAL, LATITUDE REAL, LONGITUDE REAL," +
 		   "ALTITUDE REAL, ACCURACY REAL, SPEED REAL, BEARING REAL);");
 	db.close();
 	Log.i(tag, "Database opened ok");
@@ -92,7 +90,7 @@ public class GPSLoggerService extends Service {
 
 	public void onLocationChanged(Location loc) {
 	    long now = (long) (System.currentTimeMillis() / 1000L);
-	    if ((loc != null) && (now > (lastrefresh + refreshinterval))) {
+	    if (loc != null) {
 		boolean pointIsRecorded = false;
 		try {
 		    if (loc.hasAccuracy() && loc.getAccuracy() <= minAccuracyMeters) {
@@ -103,8 +101,9 @@ public class GPSLoggerService extends Service {
 			greg.add(Calendar.SECOND, (offset/1000) * -1);
 			StringBuffer queryBuf = new StringBuffer();
 			queryBuf.append("INSERT INTO "+POINTS_TABLE_NAME+
-					" (GMTTIMESTAMP,LATITUDE,LONGITUDE,ALTITUDE,ACCURACY,SPEED,BEARING) VALUES (" +
+					" (GMTTIMESTAMP,TIMESTAMP,LATITUDE,LONGITUDE,ALTITUDE,ACCURACY,SPEED,BEARING) VALUES (" +
 					"'"+timestampFormat.format(greg.getTime())+"',"+
+					+ (double) now +","+
 					loc.getLatitude()+","+
 					loc.getLongitude()+","+
 					(loc.hasAltitude() ? loc.getAltitude() : "NULL")+","+
@@ -122,11 +121,6 @@ public class GPSLoggerService extends Service {
 			db.close();
 		}
 		if (pointIsRecorded) {
-		    long elapsed = now - lastrefresh;
-		    Toast.makeText(getBaseContext(),
-				   String.format("Elapsed: %d", elapsed),
-				   Toast.LENGTH_SHORT).show();
-		    lastrefresh = now;
 		    if (showingDebugToast) Toast.makeText(
 							  getBaseContext(),
 							  "Location stored: \nLat: " + sevenSigDigits.format(loc.getLatitude())
@@ -192,12 +186,12 @@ public class GPSLoggerService extends Service {
 
 	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 	String buslayer = settings.getString("BusLayer", "");
-	refreshinterval = settings.getLong("RefreshInterval", 1) * 60L;
-	lastrefresh = 0L;
-	// Toast.makeText(getBaseContext(), "Layer: " + buslayer, Toast.LENGTH_SHORT).show();
-	Toast.makeText(getBaseContext(),
-		       String.format("Refresh: %d", refreshinterval),
-		       Toast.LENGTH_SHORT).show();
+	// refreshinterval = settings.getLong("RefreshInterval", 1) * 60L;
+	// lastrefresh = 0L;
+	Toast.makeText(getBaseContext(), "Layer: " + buslayer, Toast.LENGTH_SHORT).show();
+	// Toast.makeText(getBaseContext(),
+	// 	       String.format("Refresh: %d", refreshinterval),
+	// 	       Toast.LENGTH_SHORT).show();
 	
 	startLoggerService();
 

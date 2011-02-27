@@ -15,8 +15,8 @@
 	     android:label="Bus GPS Logger" android:exported="true"
 	     android:enabled="true">
     </service>
-    <service android:name=".service.SGUpdateService"
-	     android:label="Bus SimpleGeo Updater" android:exported="true"
+    <service android:name=".service.NetUpdateService"
+	     android:label="Bus Net Updater" android:exported="true"
 	     android:enabled="true">
     </service>
   </application>
