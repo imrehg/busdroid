@@ -29,7 +29,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import android.content.SharedPreferences;
-import com.startupbus.location.service.SGUpdateService;
+import com.startupbus.location.service.NetUpdateService;
 
 public class GPSLoggerService extends Service {
 
@@ -51,7 +51,7 @@ public class GPSLoggerService extends Service {
     private int lastStatus = 0;
     private static boolean showingDebugToast = false;
 
-    private static final String tag = "GPSLoggerService";
+    private static final String tag = "BusDroid:GPSLoggerService";
 
     public static final String PREFS_NAME = "BusdroidPrefs";
 
@@ -76,7 +76,7 @@ public class GPSLoggerService extends Service {
     private void initDatabase() {
 	db = this.openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READWRITE, null);
 	db.execSQL("CREATE TABLE IF NOT EXISTS " +
-		   POINTS_TABLE_NAME + " (GMTTIMESTAMP VARCHAR, TIMESTAMP REAL, LATITUDE REAL, LONGITUDE REAL," +
+		   POINTS_TABLE_NAME + " (GMTTIMESTAMP VARCHAR, TIMESTAMP BIGINT, LATITUDE REAL, LONGITUDE REAL," +
 		   "ALTITUDE REAL, ACCURACY REAL, SPEED REAL, BEARING REAL);");
 	db.close();
 	Log.i(tag, "Database opened ok");
@@ -103,7 +103,7 @@ public class GPSLoggerService extends Service {
 			queryBuf.append("INSERT INTO "+POINTS_TABLE_NAME+
 					" (GMTTIMESTAMP,TIMESTAMP,LATITUDE,LONGITUDE,ALTITUDE,ACCURACY,SPEED,BEARING) VALUES (" +
 					"'"+timestampFormat.format(greg.getTime())+"',"+
-					+ (double) now +","+
+					+ now +","+
 					loc.getLatitude()+","+
 					loc.getLongitude()+","+
 					(loc.hasAltitude() ? loc.getAltitude() : "NULL")+","+
@@ -170,6 +170,23 @@ public class GPSLoggerService extends Service {
 
     }
 
+
+    public void startNetUpdate() {
+    	startService(new Intent(GPSLoggerService.this,
+    				NetUpdateService.class));
+	Toast.makeText(getBaseContext(),
+		       "StartNet - from GPS",
+		       Toast.LENGTH_SHORT).show();
+    }
+
+    public void stopNetUpdate() {
+	Toast.makeText(getBaseContext(),
+		       "Stop Net - from GPS",
+		       Toast.LENGTH_SHORT).show();
+    	stopService(new Intent(GPSLoggerService.this,
+    				NetUpdateService.class));
+    }
+
     // Below is the service framework methods
 
     private NotificationManager mNM;
@@ -199,15 +216,15 @@ public class GPSLoggerService extends Service {
 	// status bar.
 	showNotification();
 	// startNetUpdate();
-
+	startNetUpdate();
     }
 
     @Override
     public void onDestroy() {
 	super.onDestroy();
 	// stopNetUpdate();
+	stopNetUpdate();
 	shutdownLoggerService();
-
     }
     
     // public void startNetUpdate() {

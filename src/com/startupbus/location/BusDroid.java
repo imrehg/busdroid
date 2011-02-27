@@ -47,10 +47,16 @@ import com.cleardb.app.Client;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+
 
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
     private static final String TAG = "BusDroid";
+
+    public static final String DATABASE_NAME = "GPSLOGGERDB";
+    public static final String POINTS_TABLE_NAME = "LOCATION_POINTS";
 
     private LocationManager myManager;
     Button buttonStart, buttonStop;
@@ -213,29 +219,39 @@ public class BusDroid extends Activity implements OnClickListener {
 				GPSLoggerService.class));
     }
 
-    /*
-     * Net related service
-     */
-    public void startNetUpdate() {
-    	startService(new Intent(BusDroid.this,
-    				NetUpdateService.class));
-    }
+    // /*
+    //  * Net related service
+    //  */
+    // public void startNetUpdate() {
+    // 	startService(new Intent(BusDroid.this,
+    // 				NetUpdateService.class));
+    // }
 
-    public void stopNetUpdate() {
-    	stopService(new Intent(BusDroid.this,
-    				NetUpdateService.class));
+    // public void stopNetUpdate() {
+    // 	stopService(new Intent(BusDroid.this,
+    // 				NetUpdateService.class));
+    // }
+
+    public void getLastLoc() {
+	SQLiteDatabase db = openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READONLY, null);
+	String query = "SELECT * from "+POINTS_TABLE_NAME+" ORDER BY timestamp DESC LIMIT 1;";
+	Cursor cur = db.rawQuery(query, new String [] {});
+	cur.moveToFirst();
+	debugArea.append(cur.getString(cur.getColumnIndex("GMTTIMESTAMP")));
     }
 
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
+	    // TEMPORARY
 	    startGPS();
-	    startNetUpdate();
-	    debugArea.setText("Yeah");
+	    // startNetUpdate();
+	    // debugArea.setText("Yeah");
+	    // getLastLoc();
 	    break;
 	case R.id.buttonStop:
 	    stopGPS();
-	    stopNetUpdate();
+	    // stopNetUpdate();
    	    debugArea.setText("Noeh");
 	    break;
 
