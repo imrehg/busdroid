@@ -80,7 +80,7 @@ public class NetUpdateService extends Service {
    //    + REMOTE_TABLE_NAME + "(bus_id, timestamp, longitude, latitude) values ('?', '?', '?', '?')";
 
 
-    public void sendUpdate(String bus_id, Long timestamp, double lat, double lon) {
+    public void sendUpdate(String bus_id, Long timestamp, double lon, double lat) {
 	try {
 	    cleardbClient = new com.cleardb.app.Client(API_KEY, APP_ID);
 	    cleardbClient.startTransaction();
@@ -125,7 +125,7 @@ public class NetUpdateService extends Service {
 		Double lon = cur.getDouble(cur.getColumnIndex("LONGITUDE"));
 		Double lat = cur.getDouble(cur.getColumnIndex("LATITUDE"));
 		Long timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
-		Log.i(tag, String.format("%s: %f, %f at %d (latest since  %d)", bus_id, lat, lon, timestamp, last_update));
+		Log.i(tag, String.format("%s: %f lon, %f lat at %d (latest since  %d)", bus_id, lon, lat, timestamp, last_update));
 		sendUpdate(bus_id, timestamp, lon, lat);
 		prefedit.putLong("last_update", (long)timestamp);
 		prefedit.commit();
