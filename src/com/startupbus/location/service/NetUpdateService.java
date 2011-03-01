@@ -36,7 +36,17 @@ import com.cleardb.app.ClearDBQueryException;
 import com.cleardb.app.ClearDBInTransactionException;
 import com.cleardb.app.Client;
 import org.json.JSONObject;
+import org.json.JSONException;
 import org.json.JSONArray;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.entity.ByteArrayEntity;
 
 // import com.startupbus.location.service.GPSLoggerService;
 
@@ -72,6 +82,10 @@ public class NetUpdateService extends Service {
     private final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     private final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
 
+    private final String LocationServerURI = "http://startupbus.com:3000/api/locations";
+    // // Local debug with netcat
+    // private final String LocationServerURI = "http://192.168.2.14:3000";
+
     private com.cleardb.app.Client cleardbClient;
 
     private Timer testTimer;
@@ -79,35 +93,66 @@ public class NetUpdateService extends Service {
    // private static final String INSERT = "insert into " 
    //    + REMOTE_TABLE_NAME + "(bus_id, timestamp, longitude, latitude) values ('?', '?', '?', '?')";
 
+    public static void postToServer(String uri, JSONArray multi_update) throws Exception {
+	int TIMEOUT_MILLISEC = 10000;  // = 10 seconds
+	HttpParams httpParams = new BasicHttpParams();
+	HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
+	HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
+	HttpClient client = new DefaultHttpClient(httpParams);
 
-    public void sendUpdate(String bus_id, Long timestamp, double lon, double lat) {
+	HttpPost request = new HttpPost(uri);
+	request.setEntity(new ByteArrayEntity(multi_update.toString().getBytes("UTF8")));
+	HttpResponse response = client.execute(request);
+	Log.i(tag, response.getStatusLine().toString());    }
+
+    public void sendUpdate(int bus_id, long timestamp, double lon, double lat) {
+	// try {
+	//     cleardbClient = new com.cleardb.app.Client(API_KEY, APP_ID);
+	//     cleardbClient.startTransaction();
+	// } catch (ClearDBInTransactionException e) {
+	//     return;
+	// }
+	// String query = String.format("INSERT INTO startupbus (bus_id, timestamp, longitude, latitude) VALUES ('%s', '%d', '%f', '%f')",
+	// 		      bus_id,
+	// 		      timestamp,
+	// 		      lon,
+	// 		      lat);
+	// try {
+	//     cleardbClient.query(query);
+	// } catch (ClearDBQueryException e) {
+	//     Log.i(tag, "Query fail, ClearDB");
+	// } catch (Exception e) {
+	//     Log.i(tag, "Query fail, other");
+	// }
+
+	// try {
+	//     JSONObject payload = cleardbClient.sendTransaction();
+	// } catch (ClearDBQueryException clearE) {
+	//     System.out.println("ClearDB Exception: " + clearE.getMessage());
+	// } catch (Exception e) {
+	//     System.out.println("General Exception: " + e.getMessage());
+	// }
+	// Log.i(tag, "Update run");
+
+	JSONObject update = new JSONObject();
 	try {
-	    cleardbClient = new com.cleardb.app.Client(API_KEY, APP_ID);
-	    cleardbClient.startTransaction();
-	} catch (ClearDBInTransactionException e) {
+	    update.put("bus_id", bus_id);
+	    update.put("sampled_at", timestamp);
+	    update.put("longitude", lon);
+	    update.put("latitude", lat);
+	} catch(JSONException e) {
+	    Log.i(tag, "JSON error in creating update, nothing sent");
 	    return;
 	}
-	String query = String.format("INSERT INTO startupbus (bus_id, timestamp, longitude, latitude) VALUES ('%s', '%d', '%f', '%f')",
-			      bus_id,
-			      timestamp,
-			      lon,
-			      lat);
+	JSONArray multi_update = new JSONArray();
+	multi_update.put(update);
+	Log.i(tag, "Update to send: " + multi_update.toString() + " => " + LocationServerURI);
 	try {
-	    cleardbClient.query(query);
-	} catch (ClearDBQueryException e) {
-	    Log.i(tag, "Query fail, ClearDB");
-	} catch (Exception e) {
-	    Log.i(tag, "Query fail, other");
+	    postToServer(LocationServerURI, multi_update);
+	    Log.i(tag, "Update run, JSON format");
+	} catch(Exception e) {
+	    Log.i(tag, "Sending update failed");
 	}
-
-	try {
-	    JSONObject payload = cleardbClient.sendTransaction();
-	} catch (ClearDBQueryException clearE) {
-	    System.out.println("ClearDB Exception: " + clearE.getMessage());
-	} catch (Exception e) {
-	    System.out.println("General Exception: " + e.getMessage());
-	}
-	Log.i(tag, "Update run");
     }
 
     ////////// Timer
@@ -125,8 +170,9 @@ public class NetUpdateService extends Service {
 		Double lon = cur.getDouble(cur.getColumnIndex("LONGITUDE"));
 		Double lat = cur.getDouble(cur.getColumnIndex("LATITUDE"));
 		Long timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
+		// String timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
 		Log.i(tag, String.format("%s: %f lon, %f lat at %d (latest since  %d)", bus_id, lon, lat, timestamp, last_update));
-		sendUpdate(bus_id, timestamp, lon, lat);
+		sendUpdate(2, timestamp, lon, lat);
 		prefedit.putLong("last_update", (long)timestamp);
 		prefedit.commit();
 	    } catch (Exception e) {
