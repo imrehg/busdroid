@@ -94,7 +94,7 @@ public class NetUpdateService extends Service {
    // private static final String INSERT = "insert into " 
    //    + REMOTE_TABLE_NAME + "(bus_id, timestamp, longitude, latitude) values ('?', '?', '?', '?')";
 
-    public static void postToServer(String uri, JSONArray multi_update) throws Exception {
+    public static void postToServer(String uri, JSONObject payload) throws Exception {
 	int TIMEOUT_MILLISEC = 10000;  // = 10 seconds
 	HttpParams httpParams = new BasicHttpParams();
 	HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
@@ -102,7 +102,7 @@ public class NetUpdateService extends Service {
 	HttpClient client = new DefaultHttpClient(httpParams);
 
 	HttpPost request = new HttpPost(uri);
-	request.setEntity(new ByteArrayEntity(multi_update.toString().getBytes("UTF8")));
+	request.setEntity(new ByteArrayEntity(payload.toString().getBytes("UTF8")));
 	request.setHeader("Accept", "application/json");
 	request.setHeader("Content-type", "application/json");
 	HttpResponse response = client.execute(request);
@@ -163,9 +163,16 @@ public class NetUpdateService extends Service {
 	}
 
 	multi_update.put(update);
-	Log.i(tag, "Update to send: " + multi_update.toString() + " => " + LocationServerURI);
+	JSONObject payload = new JSONObject();
 	try {
-	    postToServer(LocationServerURI, multi_update);
+	    payload.put("locations", multi_update);
+	} catch(JSONException e) {
+	    Log.i(tag, "JSON error in creating payload, nothing sent");
+	    return;
+	}
+	Log.i(tag, "Payload to send: " + payload.toString() + " => " + LocationServerURI);
+	try {
+	    postToServer(LocationServerURI, payload);
 	    Log.i(tag, "Update run, JSON format");
 	    prefedit.putString("outstanding_updates", "");
 	    prefedit.commit();
@@ -180,6 +187,8 @@ public class NetUpdateService extends Service {
     class testTask extends TimerTask {
 	public void run() {
 	    last_update = settings.getLong("last_update", 0);
+	    // // Force to update
+	    // last_update = 0;
 	    Log.i(tag, String.format("Got last update: %d", last_update));
 	    SQLiteDatabase db = openOrCreateDatabase(DATABASE_NAME, SQLiteDatabase.OPEN_READONLY, null);
 	    String query = String.format("SELECT * from %s WHERE TIMESTAMP > %d ORDER BY timestamp DESC LIMIT 1;",
