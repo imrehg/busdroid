@@ -134,6 +134,19 @@ public class NetUpdateService extends Service {
 	// }
 	// Log.i(tag, "Update run");
 
+	JSONArray multi_update;
+	String outstanding_updates = settings.getString("outstanding_updates", "");
+	if (outstanding_updates != "") {
+	    try {
+		multi_update = new JSONArray(outstanding_updates);
+	    } catch(JSONException e) {
+		Log.i(tag, "Getting outstanding updates didn't work out well");
+		multi_update = new JSONArray();
+	    }
+	} else {
+	    multi_update = new JSONArray();
+	}
+
 	JSONObject update = new JSONObject();
 	try {
 	    update.put("bus_id", bus_id);
@@ -144,14 +157,18 @@ public class NetUpdateService extends Service {
 	    Log.i(tag, "JSON error in creating update, nothing sent");
 	    return;
 	}
-	JSONArray multi_update = new JSONArray();
+
 	multi_update.put(update);
 	Log.i(tag, "Update to send: " + multi_update.toString() + " => " + LocationServerURI);
 	try {
 	    postToServer(LocationServerURI, multi_update);
 	    Log.i(tag, "Update run, JSON format");
+	    prefedit.putString("outstanding_updates", "");
+	    prefedit.commit();
 	} catch(Exception e) {
 	    Log.i(tag, "Sending update failed");
+	    prefedit.putString("outstanding_updates", multi_update.toString());
+	    prefedit.commit();
 	}
     }
 
@@ -170,8 +187,8 @@ public class NetUpdateService extends Service {
 		Double lon = cur.getDouble(cur.getColumnIndex("LONGITUDE"));
 		Double lat = cur.getDouble(cur.getColumnIndex("LATITUDE"));
 		Long timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
-		// String timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
 		Log.i(tag, String.format("%s: %f lon, %f lat at %d (latest since  %d)", bus_id, lon, lat, timestamp, last_update));
+		// Only sends when there's a new update, even if there are outstanding ones...
 		sendUpdate(2, timestamp, lon, lat);
 		prefedit.putLong("last_update", (long)timestamp);
 		prefedit.commit();
