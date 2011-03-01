@@ -58,7 +58,7 @@ public class NetUpdateService extends Service {
     public static final String REMOTE_TABLE_NAME = "startupbus";
 
     private final DecimalFormat sevenSigDigits = new DecimalFormat("0.#######");
-    private final DateFormat timestampFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    private final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
 
     private LocationManager lm;
     private LocationListener locationListener;
@@ -85,6 +85,7 @@ public class NetUpdateService extends Service {
     private final String LocationServerURI = "http://startupbus.com:3000/api/locations";
     // // Local debug with netcat
     // private final String LocationServerURI = "http://192.168.2.14:3000";
+    // private final String LocationServerURI = "http://192.168.11.20:3000/api/locations";
 
     private com.cleardb.app.Client cleardbClient;
 
@@ -102,10 +103,12 @@ public class NetUpdateService extends Service {
 
 	HttpPost request = new HttpPost(uri);
 	request.setEntity(new ByteArrayEntity(multi_update.toString().getBytes("UTF8")));
+	request.setHeader("Accept", "application/json");
+	request.setHeader("Content-type", "application/json");
 	HttpResponse response = client.execute(request);
 	Log.i(tag, response.getStatusLine().toString());    }
 
-    public void sendUpdate(int bus_id, long timestamp, double lon, double lat) {
+    public void sendUpdate(int bus_id, long timestamp, float lon, float lat) {
 	// try {
 	//     cleardbClient = new com.cleardb.app.Client(API_KEY, APP_ID);
 	//     cleardbClient.startTransaction();
@@ -149,8 +152,9 @@ public class NetUpdateService extends Service {
 
 	JSONObject update = new JSONObject();
 	try {
+	    String sampletime = timestampFormat.format(timestamp*1000L);
 	    update.put("bus_id", bus_id);
-	    update.put("sampled_at", timestamp);
+	    update.put("sampled_at", sampletime);
 	    update.put("longitude", lon);
 	    update.put("latitude", lat);
 	} catch(JSONException e) {
@@ -184,8 +188,8 @@ public class NetUpdateService extends Service {
 	    Cursor cur = db.rawQuery(query, new String [] {});
 	    try {
 		cur.moveToFirst();
-		Double lon = cur.getDouble(cur.getColumnIndex("LONGITUDE"));
-		Double lat = cur.getDouble(cur.getColumnIndex("LATITUDE"));
+		float lon = cur.getFloat(cur.getColumnIndex("LONGITUDE"));
+		float lat = cur.getFloat(cur.getColumnIndex("LATITUDE"));
 		Long timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
 		Log.i(tag, String.format("%s: %f lon, %f lat at %d (latest since  %d)", bus_id, lon, lat, timestamp, last_update));
 		// Only sends when there's a new update, even if there are outstanding ones...
