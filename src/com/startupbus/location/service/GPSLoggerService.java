@@ -44,9 +44,9 @@ public class GPSLoggerService extends Service {
     private LocationListener locationListener;
     private SQLiteDatabase db;
 
-    private static long minTimeMillis = 2000;
-    private static long minDistanceMeters = 10;
-    private static float minAccuracyMeters = 35;
+    private static long minTimeMillis = 0;
+    private static long minDistanceMeters = 0;
+    private static float minAccuracyMeters = 100;
 
     private int lastStatus = 0;
     private static boolean showingDebugToast = false;
