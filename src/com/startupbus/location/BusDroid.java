@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.ToggleButton;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
 import com.startupbus.location.service.GPSLoggerService;
 import com.startupbus.location.service.NetUpdateService;
 
@@ -52,6 +54,11 @@ import android.database.Cursor;
 
 import android.provider.Settings;
 
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
+
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
     private static final String tag = "BusDroid:Main";
@@ -68,6 +75,7 @@ public class BusDroid extends Activity implements OnClickListener {
     final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
 
+    private HashMap<String, Integer> city_map;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +97,15 @@ public class BusDroid extends Activity implements OnClickListener {
 	buttonStart.setOnClickListener(this);
 	buttonStop.setOnClickListener(this);
 
+	// Set city mapping - quick and dirty hard-coding
+	city_map = new HashMap(6);
+	city_map.put("New York", new Integer(1));
+	city_map.put("San Francisco", new Integer(2));
+	city_map.put("Silicon Valley", new Integer(3));
+	city_map.put("Chicago", new Integer(4));
+	city_map.put("Miami", new Integer(5));
+	city_map.put("Cleveland", new Integer(6));
+	
 	// // LocationManager locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	// myManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
 	// Location l = myManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -284,6 +301,85 @@ public class BusDroid extends Activity implements OnClickListener {
 	saveSettings();
     }
 
+
+    // Config menu items
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+	MenuInflater inflater = getMenuInflater();
+	inflater.inflate(R.menu.menu, menu);
+	return true;
+    }
+
+    public void toggleChecked(MenuItem item) {
+	if (item.isChecked()) item.setChecked(false);
+	else item.setChecked(true);
+    }
+
+    public void setRefreshInterval(int minutes) {
+	// Fill in proper content!
+	Toast.makeText(BusDroid.this, String.format("Refresh interval: %d", minutes),
+		       Toast.LENGTH_LONG).show();
+    }
+
+    public void setBusID(int bus_id) {
+	// Fill in proper content!
+	Toast.makeText(BusDroid.this, String.format("Bus ID set: %d", bus_id),
+		       Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	// Handle item selection
+	switch (item.getItemId()) {
+	case R.id.bus_id_setting:
+	    return true;
+	case R.id.refresh_setting:
+	    return true;
+	case R.id.refresh_1:
+	    setRefreshInterval(1);
+	    toggleChecked(item);
+	    return true;
+	case R.id.refresh_2:
+	    setRefreshInterval(2);
+	    toggleChecked(item);
+	    return true;
+	case R.id.refresh_5:
+	    setRefreshInterval(5);
+	    toggleChecked(item);
+	    return true;
+	case R.id.refresh_10:
+	    setRefreshInterval(10);
+	    toggleChecked(item);
+	    return true;
+
+	case R.id.bus_chicago_check:
+	case R.id.bus_cleveland_check:
+	case R.id.bus_miami_check:
+	case R.id.bus_newyork_check:
+	case R.id.bus_sanfrancisco_check:
+	case R.id.bus_siliconvalley_check:
+	    setBusID(city_map.get(item.getTitle()));
+	    toggleChecked(item);
+	    return true;
+
+	default:
+	    return super.onOptionsItemSelected(item);
+	}
+    }
+
+    // public void popupClick() {
+    //     PopupMenu popup = new PopupMenu(this);
+    //     popup.getMenuInflater().inflate(R.menu.refresh, popup.getMenu());
+
+    //     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+    //         public boolean onMenuItemClick(MenuItem item) {
+    //             Toast.makeText(BusDroid.this, "Clicked popup menu item " + item.getTitle(),
+    // 			       Toast.LENGTH_SHORT).show();
+    //             return true;
+    //         }
+    // 	});
+    //     popup.show();
+    // }
 
    private void CheckEnableGPS(){
        // Check GPS settings and prompt if GPS satellite access  is not enabled
