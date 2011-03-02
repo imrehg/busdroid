@@ -307,6 +307,11 @@ public class BusDroid extends Activity implements OnClickListener {
     public boolean onCreateOptionsMenu(Menu menu) {
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.menu, menu);
+	// Load defaults and use them
+	MenuItem city = menu.findItem(R.id.bus_sanfrancisco_check);
+	city.setChecked(true);
+	MenuItem refresh = menu.findItem(R.id.refresh_2);
+	refresh.setChecked(true);
 	return true;
     }
 
@@ -335,6 +340,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	    return true;
 	case R.id.refresh_setting:
 	    return true;
+
 	case R.id.refresh_1:
 	    setRefreshInterval(1);
 	    toggleChecked(item);
