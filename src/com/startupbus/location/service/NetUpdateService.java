@@ -202,7 +202,7 @@ public class NetUpdateService extends Service {
 		Long timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
 		Log.i(tag, String.format("%s: %f lon, %f lat at %d (latest since  %d)", bus_id, lon, lat, timestamp, last_update));
 		// Only sends when there's a new update, even if there are outstanding ones...
-		sendUpdate(2, timestamp, lon, lat);
+		sendUpdate(bus_id, timestamp, lon, lat);
 		prefedit.putLong("last_update", (long)timestamp);
 		prefedit.commit();
 	    } catch (Exception e) {
