@@ -245,11 +245,26 @@ public class BusDroid extends Activity implements OnClickListener {
     public void startGPS() {
 	startService(new Intent(BusDroid.this,
 				GPSLoggerService.class));
+	Log.i(tag, "Started GPS service.");
     }
 
-    public void stopGPS() {
-	stopService(new Intent(BusDroid.this,
-				GPSLoggerService.class));
+    public boolean stopGPS() {
+	boolean res = stopService(new Intent(BusDroid.this,
+				     GPSLoggerService.class));
+	if (res == false) {
+	    Log.i(tag, "Tried to stop GPS service that wasn't running.");
+	    return(false);
+	} else {
+	    Log.i(tag, "Stopped GPS service.");
+	    return(true);
+	}
+    }
+
+    public void restartGPS() {
+	boolean res = stopGPS();
+	if (res) {
+	    startGPS();
+	}
     }
 
     // /*
@@ -379,6 +394,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	Log.i(tag, String.format("New refresh interval set: %d (was %d)", minutes, refresh_interval));
 	refresh_interval = minutes;
 	saveSettings();
+	restartGPS();
     }
 
     public void setBusID(int new_bus_id) {
@@ -387,6 +403,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	bus_id = new_bus_id;
 	cityview.setText(city_map_reverse.get(bus_id));
 	saveSettings();
+	restartGPS();
     }
 
     @Override
