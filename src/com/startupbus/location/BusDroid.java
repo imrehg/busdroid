@@ -77,6 +77,7 @@ public class BusDroid extends Activity implements OnClickListener {
     final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
 
     private HashMap<String, Integer> city_map;
+    private HashMap<Integer, String> city_map_reverse;
 
     private SharedPreferences settings;
     private SharedPreferences.Editor settingsEditor;
@@ -109,7 +110,16 @@ public class BusDroid extends Activity implements OnClickListener {
 	city_map.put("Chicago", new Integer(4));
 	city_map.put("Miami", new Integer(5));
 	city_map.put("Cleveland", new Integer(6));
-	
+
+	city_map_reverse = new HashMap(6);
+	Set s= city_map.keySet();
+	Iterator i=s.iterator();
+	String city;
+	while(i.hasNext()) {
+	    city = (String) i.next();
+	    city_map_reverse.put(city_map.get(city), city);
+	}
+
 	// // LocationManager locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	// myManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
 	// Location l = myManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
