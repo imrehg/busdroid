@@ -76,7 +76,7 @@ public class NetUpdateService extends Service {
     public static final String PREFS_NAME = "BusdroidPrefs";
     private SharedPreferences settings;
     private SharedPreferences.Editor prefedit;
-    private String bus_id;
+    private int bus_id;
     private long last_update;
 
     private final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
@@ -218,10 +218,11 @@ public class NetUpdateService extends Service {
 
 	settings = getSharedPreferences(PREFS_NAME, 0);
 	prefedit = settings.edit();
-	bus_id = settings.getString("bus_id", "Test");
+	bus_id = settings.getInt("bus_id", 1);
+	int refresh_interval = settings.getInt("refresh_interval", 1);
 
 	testTimer = new Timer();
-	testTimer.scheduleAtFixedRate(new testTask(), 10L, 30*1000L);
+	testTimer.scheduleAtFixedRate(new testTask(), 10L, refresh_interval*60*1000L);
     }
 
     @Override

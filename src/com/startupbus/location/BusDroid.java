@@ -70,12 +70,16 @@ public class BusDroid extends Activity implements OnClickListener {
     Button buttonStart, buttonStop;
     TextView debugArea;
     EditText sglayeredit;
-    String bus_id;
+    private int bus_id;
+    private int refresh_interval;
 
     final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
 
     private HashMap<String, Integer> city_map;
+
+    private SharedPreferences settings;
+    private SharedPreferences.Editor settingsEditor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,16 +87,16 @@ public class BusDroid extends Activity implements OnClickListener {
 	setContentView(R.layout.main);
 	
 	// Restore preferences
-	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	String bus_id = settings.getString("bus_id", "Test");
+	settings = getSharedPreferences(PREFS_NAME, 0);
+	settingsEditor = settings.edit();
+
+	bus_id = settings.getInt("bus_id", 1);
+	refresh_interval = settings.getInt("refresh_interval", 1);
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
 
 	debugArea = (TextView) findViewById(R.id.debugArea);
-
-	sglayeredit = (EditText) findViewById(R.id.sglayeredit);
-	sglayeredit.setText(bus_id);
 
 	buttonStart.setOnClickListener(this);
 	buttonStop.setOnClickListener(this);
@@ -279,21 +283,19 @@ public class BusDroid extends Activity implements OnClickListener {
     public void saveSettings(){
 	// Save Shared Preferences
 
-	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	SharedPreferences.Editor editor = settings.edit();
-
 	// If the city name is changed, ignore all previous points when
 	// checking for new locations
 	long now = (long) (System.currentTimeMillis() / 1000L);
-	editor.putLong("last_update", now);
-
+	settingsEditor.putLong("last_update", now);
 
 	// Name of bus in Database
-	bus_id = sglayeredit.getText().toString();
-	editor.putString("bus_id", bus_id);
+	settingsEditor.putInt("bus_id", bus_id);
+
+	// Refresh_interval
+	settingsEditor.putInt("refresh_interval", refresh_interval);
 
 	// Commit the edits!
-	editor.commit();	
+	settingsEditor.commit();
     }
 
     protected void onStop(){
@@ -321,15 +323,17 @@ public class BusDroid extends Activity implements OnClickListener {
     }
 
     public void setRefreshInterval(int minutes) {
-	// Fill in proper content!
-	Toast.makeText(BusDroid.this, String.format("Refresh interval: %d", minutes),
-		       Toast.LENGTH_LONG).show();
+	// Update refresh interval in database
+	Log.i(tag, String.format("New refresh interval set: %d (was %d)", minutes, refresh_interval));
+	refresh_interval = minutes;
+	saveSettings();
     }
 
-    public void setBusID(int bus_id) {
-	// Fill in proper content!
-	Toast.makeText(BusDroid.this, String.format("Bus ID set: %d", bus_id),
-		       Toast.LENGTH_LONG).show();
+    public void setBusID(int new_bus_id) {
+	// Update bus id in database
+	Log.i(tag, String.format("New Bus ID set: %d (was %d)", new_bus_id, bus_id));
+	bus_id = new_bus_id;
+	saveSettings();
     }
 
     @Override
