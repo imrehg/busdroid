@@ -8,29 +8,34 @@
       android:layout_height="wrap_content"
       android:layout_width="wrap_content"
       android:src="@drawable/sblogo"
-      android:padding="20dp" />
-
+      android:padding="20dp"
+      />
   <TextView android:layout_width="fill_parent" 
       android:layout_height="wrap_content"
-      android:text="Bus city:"
+      android:text="Riding the Startup Bus from:"
       android:gravity="left"
       android:textSize="14sp"
       />
-  <EditText
-        android:id="@+id/sglayeredit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-  	/>
+  <TextView android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/cityview"
+      android:text=""
+      android:gravity="center"
+      android:textSize="24sp"
+      android:padding="5dp"
+      />
 
   <Button android:layout_width="wrap_content" 
 	  android:layout_height="wrap_content"
 	  android:id="@+id/buttonStart" 
-	  android:text="Start" />
+	  android:padding="5dp"
+	  android:text="Start log" />
 
   <Button android:layout_width="wrap_content" 
 	  android:layout_height="wrap_content"
 	  android:id="@+id/buttonStop"
-	  android:text="Stop"/>
+	  android:padding="5dp"
+	  android:text="Stop log"/>
 
   <TextView android:layout_width="fill_parent"
       android:layout_height="wrap_content"

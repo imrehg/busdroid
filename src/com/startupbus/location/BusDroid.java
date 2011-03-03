@@ -68,6 +68,7 @@ public class BusDroid extends Activity implements OnClickListener {
 
     private LocationManager myManager;
     Button buttonStart, buttonStop;
+    private TextView cityview;
     TextView debugArea;
     EditText sglayeredit;
     private int bus_id;
@@ -97,6 +98,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
 
+	cityview = (TextView) findViewById(R.id.cityview);
 	debugArea = (TextView) findViewById(R.id.debugArea);
 
 	buttonStart.setOnClickListener(this);
@@ -119,6 +121,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	    city = (String) i.next();
 	    city_map_reverse.put(city_map.get(city), city);
 	}
+	cityview.setText(city_map_reverse.get(bus_id));
 
 	// // LocationManager locator = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	// myManager = (LocationManager) getSystemService(LOCATION_SERVICE); 
@@ -382,6 +385,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Update bus id in database
 	Log.i(tag, String.format("New Bus ID set: %d (was %d)", new_bus_id, bus_id));
 	bus_id = new_bus_id;
+	cityview.setText(city_map_reverse.get(bus_id));
 	saveSettings();
     }
 
