@@ -303,18 +303,57 @@ public class BusDroid extends Activity implements OnClickListener {
 	saveSettings();
     }
 
-
     // Config menu items
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.menu, menu);
+
 	// Load defaults and use them
-	MenuItem city = menu.findItem(R.id.bus_sanfrancisco_check);
-	city.setChecked(true);
-	MenuItem refresh = menu.findItem(R.id.refresh_2);
-	refresh.setChecked(true);
+	switch(bus_id) {
+	case 1:
+	    setThisChecked(menu, R.id.bus_newyork_check);
+	    break;
+	case 2:
+	    setThisChecked(menu, R.id.bus_sanfrancisco_check);
+	    break;
+	case 3:
+	    setThisChecked(menu, R.id.bus_siliconvalley_check);
+	    break;
+	case 4:
+	    setThisChecked(menu, R.id.bus_chicago_check);
+	    break;
+	case 5:
+	    setThisChecked(menu, R.id.bus_miami_check);
+	    break;
+	case 6:
+	default :
+	    setThisChecked(menu, R.id.bus_cleveland_check);
+	    break;
+	}
+
+	switch(refresh_interval) {
+	case 10:
+	    setThisChecked(menu, R.id.refresh_10);
+	    break;
+	case 5:
+	    setThisChecked(menu, R.id.refresh_5);
+	    break;
+	case 2:
+	    setThisChecked(menu, R.id.refresh_2);
+	    break;
+	case 1:
+	default :
+	    setThisChecked(menu, R.id.refresh_1);
+	    break;
+	}
+
 	return true;
+    }
+
+    public void setThisChecked(Menu menu, int id) {
+	MenuItem toSet = menu.findItem(id);
+	toSet.setChecked(true);
     }
 
     public void toggleChecked(MenuItem item) {
