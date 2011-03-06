@@ -59,6 +59,7 @@ public class NetUpdateService extends Service {
 
     private final DecimalFormat sevenSigDigits = new DecimalFormat("0.#######");
     private final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+    private final DateFormat timestampFormatShort = new SimpleDateFormat("HH:mm:ss");
 
     private LocationManager lm;
     private LocationListener locationListener;
@@ -91,6 +92,10 @@ public class NetUpdateService extends Service {
     private com.cleardb.app.Client cleardbClient;
 
     private Timer testTimer;
+
+    private String ns;
+    private NotificationManager mNM;
+
 
    // private static final String INSERT = "insert into " 
    //    + REMOTE_TABLE_NAME + "(bus_id, timestamp, longitude, latitude) values ('?', '?', '?', '?')";
@@ -177,11 +182,39 @@ public class NetUpdateService extends Service {
 	    Log.i(tag, "Update run, JSON format");
 	    prefedit.putString("outstanding_updates", "");
 	    prefedit.commit();
+	    showNotification("Location sent",
+			     "Bus location sent okay",
+			     true);
 	} catch(Exception e) {
 	    Log.i(tag, "Sending update failed");
 	    prefedit.putString("outstanding_updates", multi_update.toString());
 	    prefedit.commit();
+	    showNotification("Failed location update",
+			     "Location update failed at "+timestampFormatShort.format(timestamp*1000L),
+			     false);
 	}
+    }
+
+    public void showNotification(CharSequence tickerText, CharSequence contentText, boolean good) {
+	int icon;
+	if (good) {
+	    icon = R.drawable.nf_icon_well;
+	} else {
+	    icon = R.drawable.nf_icon_notwell;
+	}
+
+	long when = System.currentTimeMillis();         // notification time
+	Context context = getApplicationContext();      // application Context
+	CharSequence contentTitle = "BusDroid";  // expanded message title
+
+	Intent notificationIntent = new Intent(this, NetUpdateService.class);
+	PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+	Notification notification = new Notification(icon, tickerText, when);
+	notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+	notification.flags |= Notification.FLAG_ONGOING_EVENT;
+
+	mNM.notify(1, notification);
+	Log.i(tag, "Notification set: "+contentText);
     }
 
     ////////// Timer
@@ -226,6 +259,12 @@ public class NetUpdateService extends Service {
 
 	testTimer = new Timer();
 	testTimer.scheduleAtFixedRate(new testTask(), 10L, refresh_interval*60*1000L);
+
+	ns = Context.NOTIFICATION_SERVICE;
+	mNM = (NotificationManager) getSystemService(ns);
+	showNotification("Finding location",
+			 "Locking on to GPS signal",
+			 false);
     }
 
     @Override
@@ -233,6 +272,7 @@ public class NetUpdateService extends Service {
     	super.onDestroy();
 	// sendUpdate();
 	testTimer.cancel();
+	mNM.cancelAll();
     }
 
     @Override
