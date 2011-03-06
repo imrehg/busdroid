@@ -36,4 +36,9 @@
 	</group>
       </menu>
     </item>
+    <item android:id="@+id/push_location"
+          android:icon="@android:drawable/ic_menu_edit"
+          android:title="Remote server">
+    </item>
+
 </menu>

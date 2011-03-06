@@ -47,6 +47,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+
 
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
@@ -62,6 +65,7 @@ public class BusDroid extends Activity implements OnClickListener {
     EditText sglayeredit;
     private int bus_id;
     private int refresh_interval;
+    private String remote_server;
 
     final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
@@ -111,6 +115,10 @@ public class BusDroid extends Activity implements OnClickListener {
 	    city_map_reverse.put(city_map.get(city), city);
 	}
 	cityview.setText(city_map_reverse.get(bus_id));
+
+	remote_server = settings.getString("remote_server", "http://startupbus.com/api/locations");
+	settingsEditor.putString("remote_server", remote_server);
+	settingsEditor.commit();
 
     }
 
@@ -205,6 +213,9 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Refresh_interval
 	settingsEditor.putInt("refresh_interval", refresh_interval);
 
+	// Remote server to push to
+	settingsEditor.putString("remote_server", remote_server);
+
 	// Commit the edits!
 	settingsEditor.commit();
     }
@@ -289,6 +300,35 @@ public class BusDroid extends Activity implements OnClickListener {
 	restartGPS();
     }
 
+    public void set_location_dialog() {
+	AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+	alert.setTitle("Remote server address");
+	alert.setMessage("Careful with this option!");
+
+	// Set an EditText view to get user input 
+        final EditText input = new EditText(this);
+	alert.setView(input);
+
+	input.setText(remote_server);
+
+	alert.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    remote_server = input.getText().toString();
+		    saveSettings();
+		    restartGPS();
+		}
+	    });
+
+	alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    // Canceled.
+		}
+	    });
+
+	alert.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 	// Handle item selection
@@ -323,6 +363,10 @@ public class BusDroid extends Activity implements OnClickListener {
 	case R.id.bus_siliconvalley_check:
 	    setBusID(city_map.get(item.getTitle()));
 	    toggleChecked(item);
+	    return true;
+
+	case R.id.push_location:
+	    set_location_dialog();
 	    return true;
 
 	default:

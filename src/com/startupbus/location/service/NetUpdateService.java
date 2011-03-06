@@ -82,7 +82,8 @@ public class NetUpdateService extends Service {
     private final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     private final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
 
-    private final String LocationServerURI = "http://startupbus.com:3000/api/locations";
+    private String LocationServerURI;
+    // private final String LocationServerURI = "http://startupbus.com:3000/api/locations";
     // // Local debug with netcat
     // private final String LocationServerURI = "http://192.168.2.14:3000";
     // private final String LocationServerURI = "http://192.168.11.20:3000/api/locations";
@@ -219,6 +220,8 @@ public class NetUpdateService extends Service {
 	settings = getSharedPreferences(PREFS_NAME, 0);
 	prefedit = settings.edit();
 	bus_id = settings.getInt("bus_id", 1);
+	LocationServerURI = settings.getString("remote_server", "http://startupbus.com/api/locations");
+
 	int refresh_interval = settings.getInt("refresh_interval", 1);
 
 	testTimer = new Timer();
