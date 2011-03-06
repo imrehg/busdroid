@@ -82,7 +82,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	settingsEditor = settings.edit();
 
 	bus_id = settings.getInt("bus_id", 1);
-	refresh_interval = settings.getInt("refresh_interval", 1);
+	refresh_interval = settings.getInt("refresh_interval", 5);
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
