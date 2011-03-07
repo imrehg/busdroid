@@ -223,7 +223,7 @@ public class NetUpdateService extends Service {
 		prefedit.putLong("last_update", (long)timestamp);
 		prefedit.commit();
 	    } catch (Exception e) {
-		Log.i(tag, String.format("No new location for %s (since %d)", bus_id, last_update));
+		Log.i(tag, String.format("No new location for %s (since %d / %s)", bus_id, last_update, timestampFormat.format(last_update*1000L)));
 	    }
 	    sendUpdate(bus_id, timestamp, lon, lat);
 
