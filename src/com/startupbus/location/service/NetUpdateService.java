@@ -160,6 +160,7 @@ public class NetUpdateService extends Service {
 		postToServer(LocationServerURI, payload);
 		Log.i(tag, "Update run, JSON format");
 		prefedit.putString("outstanding_updates", "");
+		prefedit.putLong("last_update_sent", (long) System.currentTimeMillis()/1000L);
 		prefedit.commit();
 		showNotification("Location sent",
 				 "Bus location sent okay",
@@ -168,9 +169,13 @@ public class NetUpdateService extends Service {
 		Log.i(tag, "Sending update failed");
 		prefedit.putString("outstanding_updates", multi_update.toString());
 		prefedit.commit();
-		long oldtime = settings.getLong("last_update", timestamp);
+		long oldtime = settings.getLong("last_update_sent", 0);
+		String noteText = "No location update sent";
+		if (oldtime > 0) {
+		    noteText = noteText + " since " + timestampFormatShort.format(oldtime*1000L);
+		}
 		showNotification("Failed location update",
-				 "No location update since "+timestampFormatShort.format(oldtime*1000L),
+				 noteText,
 				 false);
 	    }
 	}
