@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import android.content.SharedPreferences;
 import com.startupbus.location.service.NetUpdateService;
+import com.startupbus.location.service.GeolocProviderService;
 
 public class GPSLoggerService extends Service {
 
@@ -181,6 +182,18 @@ public class GPSLoggerService extends Service {
     				NetUpdateService.class));
     }
 
+    public void startWebServer() {
+	Log.i(tag, "Starting web server.");
+	startService(new Intent(GPSLoggerService.this,
+				GeolocProviderService.class));
+    }
+
+    public void stopWebServer() {
+	Log.i(tag, "Stopping web server.");
+	stopService(new Intent(GPSLoggerService.this,
+			       GeolocProviderService.class));
+    }
+
     // Below is the service framework methods
 
     private NotificationManager mNM;
@@ -200,12 +213,14 @@ public class GPSLoggerService extends Service {
 	showNotification();
 
 	startNetUpdate();
+	startWebServer();
     }
 
     @Override
     public void onDestroy() {
 	super.onDestroy();
 	stopNetUpdate();
+	stopWebServer();
 	shutdownLoggerService();
     }
     

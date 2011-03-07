@@ -17,6 +17,8 @@ import java.util.HashMap;
 
 import com.startupbus.location.service.GPSLoggerService;
 import com.startupbus.location.service.NetUpdateService;
+import com.startupbus.location.service.GeolocProviderService;
+
 
 import android.location.Location;
 import android.location.LocationListener;

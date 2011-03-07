@@ -20,6 +20,10 @@
 	     android:label="Bus Net Updater" android:exported="true"
 	     android:enabled="true">
     </service>
+    <service android:name=".service.GeolocProviderService"
+	     android:label="Bus Geolocation Server" android:exported="true"
+	     android:enabled="true">
+    </service>
   </application>
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
