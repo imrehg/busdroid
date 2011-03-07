@@ -66,6 +66,7 @@ public class BusDroid extends Activity implements OnClickListener {
     private int bus_id;
     private int refresh_interval;
     private String remote_server;
+    private TextView push_location_view;
 
     final String APP_ID = "3bc0af918733f74f08d0b274e7ede7b0";
     final String API_KEY = "82fb3d39213cf1b75717eac4e1dd8c30b32234cb";
@@ -92,6 +93,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	buttonStop = (Button) findViewById(R.id.buttonStop);
 
 	cityview = (TextView) findViewById(R.id.cityview);
+	push_location_view = (TextView) findViewById(R.id.push_location_view);
 	debugArea = (TextView) findViewById(R.id.debugArea);
 
 	buttonStart.setOnClickListener(this);
@@ -120,6 +122,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	settingsEditor.putString("remote_server", remote_server);
 	settingsEditor.commit();
 
+	push_location_view.setText(remote_server);
     }
 
     public void testData() {
@@ -322,6 +325,7 @@ public class BusDroid extends Activity implements OnClickListener {
 		    remote_server = input.getText().toString();
 		    saveSettings(true);
 		    restartGPS();
+		    push_location_view.setText(remote_server);
 		}
 	    });
 
