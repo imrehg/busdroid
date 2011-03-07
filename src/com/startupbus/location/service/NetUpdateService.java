@@ -59,7 +59,7 @@ public class NetUpdateService extends Service {
 
     private final DecimalFormat sevenSigDigits = new DecimalFormat("0.#######");
     private final DateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
-    private final DateFormat timestampFormatShort = new SimpleDateFormat("HH:mm:ss");
+    private final DateFormat timestampFormatShort = new SimpleDateFormat("HH:mm");
 
     private LocationManager lm;
     private LocationListener locationListener;
@@ -115,34 +115,9 @@ public class NetUpdateService extends Service {
 	Log.i(tag, response.getStatusLine().toString());    }
 
     public void sendUpdate(int bus_id, long timestamp, float lon, float lat) {
-	// try {
-	//     cleardbClient = new com.cleardb.app.Client(API_KEY, APP_ID);
-	//     cleardbClient.startTransaction();
-	// } catch (ClearDBInTransactionException e) {
-	//     return;
-	// }
-	// String query = String.format("INSERT INTO startupbus (bus_id, timestamp, longitude, latitude) VALUES ('%s', '%d', '%f', '%f')",
-	// 		      bus_id,
-	// 		      timestamp,
-	// 		      lon,
-	// 		      lat);
-	// try {
-	//     cleardbClient.query(query);
-	// } catch (ClearDBQueryException e) {
-	//     Log.i(tag, "Query fail, ClearDB");
-	// } catch (Exception e) {
-	//     Log.i(tag, "Query fail, other");
-	// }
+	// Send update to server: both new and outstanding
 
-	// try {
-	//     JSONObject payload = cleardbClient.sendTransaction();
-	// } catch (ClearDBQueryException clearE) {
-	//     System.out.println("ClearDB Exception: " + clearE.getMessage());
-	// } catch (Exception e) {
-	//     System.out.println("General Exception: " + e.getMessage());
-	// }
-	// Log.i(tag, "Update run");
-
+	// Pull in outstanding updates
 	JSONArray multi_update;
 	String outstanding_updates = settings.getString("outstanding_updates", "");
 	if (outstanding_updates != "") {
@@ -156,42 +131,48 @@ public class NetUpdateService extends Service {
 	    multi_update = new JSONArray();
 	}
 
-	JSONObject update = new JSONObject();
-	try {
-	    String sampletime = timestampFormat.format(timestamp*1000L);
-	    update.put("bus_id", bus_id);
-	    update.put("sampled_at", sampletime);
-	    update.put("longitude", lon);
-	    update.put("latitude", lat);
-	} catch(JSONException e) {
-	    Log.i(tag, "JSON error in creating update, nothing sent");
-	    return;
+	if (timestamp > 0) {
+	    JSONObject update = new JSONObject();
+	    try {
+		String sampletime = timestampFormat.format(timestamp*1000L);
+		update.put("bus_id", bus_id);
+		update.put("sampled_at", sampletime);
+		update.put("longitude", lon);
+		update.put("latitude", lat);
+	    } catch(JSONException e) {
+		Log.i(tag, "JSON error in creating update, nothing sent");
+		return;
+	    }
+	    multi_update.put(update);
 	}
 
-	multi_update.put(update);
-	JSONObject payload = new JSONObject();
-	try {
-	    payload.put("locations", multi_update);
-	} catch(JSONException e) {
-	    Log.i(tag, "JSON error in creating payload, nothing sent");
-	    return;
-	}
-	Log.i(tag, "Payload to send: " + payload.toString() + " => " + LocationServerURI);
-	try {
-	    postToServer(LocationServerURI, payload);
-	    Log.i(tag, "Update run, JSON format");
-	    prefedit.putString("outstanding_updates", "");
-	    prefedit.commit();
-	    showNotification("Location sent",
-			     "Bus location sent okay",
-			     true);
-	} catch(Exception e) {
-	    Log.i(tag, "Sending update failed");
-	    prefedit.putString("outstanding_updates", multi_update.toString());
-	    prefedit.commit();
-	    showNotification("Failed location update",
-			     "Location update failed at "+timestampFormatShort.format(timestamp*1000L),
-			     false);
+	// Is there any new update to actually post?
+	if (multi_update.length() > 0) {
+	    JSONObject payload = new JSONObject();
+	    try {
+		payload.put("locations", multi_update);
+	    } catch(JSONException e) {
+		Log.i(tag, "JSON error in creating payload, nothing sent");
+		return;
+	    }
+	    Log.i(tag, "Payload to send: " + payload.toString() + " => " + LocationServerURI);
+	    try {
+		postToServer(LocationServerURI, payload);
+		Log.i(tag, "Update run, JSON format");
+		prefedit.putString("outstanding_updates", "");
+		prefedit.commit();
+		showNotification("Location sent",
+				 "Bus location sent okay",
+				 true);
+	    } catch(Exception e) {
+		Log.i(tag, "Sending update failed");
+		prefedit.putString("outstanding_updates", multi_update.toString());
+		prefedit.commit();
+		long oldtime = settings.getLong("last_update", timestamp);
+		showNotification("Failed location update",
+				 "No location update since "+timestampFormatShort.format(oldtime*1000L),
+				 false);
+	    }
 	}
     }
 
@@ -229,19 +210,23 @@ public class NetUpdateService extends Service {
 					 POINTS_TABLE_NAME,
 					 last_update);
 	    Cursor cur = db.rawQuery(query, new String [] {});
+	    long timestamp = 0;
+	    float lon = 0;
+	    float lat = 0;
+
 	    try {
 		cur.moveToFirst();
-		float lon = cur.getFloat(cur.getColumnIndex("LONGITUDE"));
-		float lat = cur.getFloat(cur.getColumnIndex("LATITUDE"));
-		Long timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
+		lon = cur.getFloat(cur.getColumnIndex("LONGITUDE"));
+		lat = cur.getFloat(cur.getColumnIndex("LATITUDE"));
+		timestamp = cur.getLong(cur.getColumnIndex("TIMESTAMP"));
 		Log.i(tag, String.format("%s: %f lon, %f lat at %d (latest since  %d)", bus_id, lon, lat, timestamp, last_update));
-		// Only sends when there's a new update, even if there are outstanding ones...
-		sendUpdate(bus_id, timestamp, lon, lat);
 		prefedit.putLong("last_update", (long)timestamp);
 		prefedit.commit();
 	    } catch (Exception e) {
 		Log.i(tag, String.format("No new location for %s (since %d)", bus_id, last_update));
 	    }
+	    sendUpdate(bus_id, timestamp, lon, lat);
+
         }
     }
 
