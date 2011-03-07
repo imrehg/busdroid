@@ -182,7 +182,7 @@ public class BusDroid extends Activity implements OnClickListener {
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
-	    saveSettings();
+	    saveSettings(false);
 	    CheckEnableGPS();
 	    startGPS();
 	    // startNetUpdate();
@@ -199,8 +199,13 @@ public class BusDroid extends Activity implements OnClickListener {
 
     }
 
-    public void saveSettings(){
+    public void saveSettings(boolean clearOutstanding){
 	// Save Shared Preferences
+
+	// Sometimes it's better to throw away some stuff we haven't handled yet
+	if (clearOutstanding) {
+	    settingsEditor.putString("outstanding_updates", "");
+	}
 
 	// If the city name is changed, ignore all previous points when
 	// checking for new locations
@@ -222,7 +227,7 @@ public class BusDroid extends Activity implements OnClickListener {
 
     protected void onStop(){
 	super.onStop();
-	saveSettings();
+	saveSettings(false);
     }
 
     // Config menu items
@@ -287,7 +292,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Update refresh interval in database
 	Log.i(tag, String.format("New refresh interval set: %d (was %d)", minutes, refresh_interval));
 	refresh_interval = minutes;
-	saveSettings();
+	saveSettings(false);
 	restartGPS();
     }
 
@@ -296,7 +301,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	Log.i(tag, String.format("New Bus ID set: %d (was %d)", new_bus_id, bus_id));
 	bus_id = new_bus_id;
 	cityview.setText(city_map_reverse.get(bus_id));
-	saveSettings();
+	saveSettings(true);
 	restartGPS();
     }
 
@@ -315,7 +320,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	alert.setPositiveButton("Set", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
 		    remote_server = input.getText().toString();
-		    saveSettings();
+		    saveSettings(true);
 		    restartGPS();
 		}
 	    });
