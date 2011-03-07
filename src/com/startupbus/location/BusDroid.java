@@ -210,12 +210,12 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Sometimes it's better to throw away some stuff we haven't handled yet
 	if (clearOutstanding) {
 	    settingsEditor.putString("outstanding_updates", "");
-	}
 
-	// If the city name is changed, ignore all previous points when
-	// checking for new locations
-	long now = (long) (System.currentTimeMillis() / 1000L);
-	settingsEditor.putLong("last_update", now);
+	    // If the city name is changed, ignore all previous points when
+	    // checking for new locations
+	    long now = (long) (System.currentTimeMillis() / 1000L);
+	    settingsEditor.putLong("last_update", now);
+	}
 
 	// Name of bus in Database
 	settingsEditor.putInt("bus_id", bus_id);
