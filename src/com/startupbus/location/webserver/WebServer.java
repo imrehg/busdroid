@@ -28,12 +28,6 @@ public class WebServer extends Thread {
     private static final String SERVER_NAME = "BusDroidGeoServer";
     private static final String ALL_PATTERN = "*";
 
-    public static final String DATABASE_NAME = "GPSLOGGERDB";
-    public static final String POINTS_TABLE_NAME = "LOCATION_POINTS";
-
-    public static final String REMOTE_TABLE_NAME = "startupbus";
-
-
     private boolean isRunning = false;
     private Context context = null;
     private int serverPort = 0;
