@@ -88,7 +88,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	settings = getSharedPreferences(PREFS_NAME, 0);
 	settingsEditor = settings.edit();
 
-	bus_id = settings.getInt("bus_id", 1);
+	bus_id = settings.getInt("bus_id", 7);
 	refresh_interval = settings.getInt("refresh_interval", 5);
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
@@ -102,15 +102,16 @@ public class BusDroid extends Activity implements OnClickListener {
 	buttonStop.setOnClickListener(this);
 
 	// Set city mapping - quick and dirty hard-coding
-	city_map = new HashMap(6);
+	city_map = new HashMap(7);
 	city_map.put("New York", new Integer(1));
 	city_map.put("San Francisco", new Integer(2));
 	city_map.put("Silicon Valley", new Integer(3));
 	city_map.put("Chicago", new Integer(4));
 	city_map.put("Miami", new Integer(5));
 	city_map.put("Cleveland", new Integer(6));
+	city_map.put("Europe", new Integer(7));
 
-	city_map_reverse = new HashMap(6);
+	city_map_reverse = new HashMap(7);
 	Set s= city_map.keySet();
 	Iterator i=s.iterator();
 	String city;
@@ -259,8 +260,11 @@ public class BusDroid extends Activity implements OnClickListener {
 	    setThisChecked(menu, R.id.bus_miami_check);
 	    break;
 	case 6:
-	default :
 	    setThisChecked(menu, R.id.bus_cleveland_check);
+	    break;
+	case 7:
+	default :
+	    setThisChecked(menu, R.id.bus_europe_check);
 	    break;
 	}
 
@@ -372,6 +376,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	case R.id.bus_newyork_check:
 	case R.id.bus_sanfrancisco_check:
 	case R.id.bus_siliconvalley_check:
+	case R.id.bus_europe_check:
 	    setBusID(city_map.get(item.getTitle()));
 	    toggleChecked(item);
 	    return true;

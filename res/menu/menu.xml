@@ -17,6 +17,8 @@
 		android:title="San Francisco" />
 	  <item android:id="@+id/bus_siliconvalley_check"
 		android:title="Silicon Valley" />
+	  <item android:id="@+id/bus_europe_check"
+		android:title="Europe" />
 	</group>
       </menu>
     </item>
