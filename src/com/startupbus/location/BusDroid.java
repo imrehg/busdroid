@@ -140,10 +140,12 @@ public class BusDroid extends Activity implements OnClickListener {
 
     }
 
+    /* Quick toast creation */
     public void makeToast(String text) {
 	Toast.makeText(BusDroid.this, text, Toast.LENGTH_LONG).show();
     }
 
+    /* Return a bus' name based on their index in the config list*/
     public String getBusName(int index) {
 	JSONArray buses;
 	JSONObject bus;
@@ -158,6 +160,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	return busname;
     }
 
+    /* Matched a bus' index to its id */
     public int getBusIndex(int id) {
 	JSONArray buses;
 	JSONObject bus;
@@ -178,6 +181,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	}
     }
 
+    /* Get a string from the net */
     public static String getStringContent(String uri) throws Exception {
 	try {
 	    HttpClient client = new DefaultHttpClient();
@@ -357,6 +361,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	return true;
     }
 
+    /* Called every time when the menu is shown, dynamic fill of bus list*/
     @Override
     public boolean onPrepareOptionsMenu (Menu menu) {
 	MenuItem busMenuItem = menu.findItem(MBUSES);
@@ -497,6 +502,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	int gID = item.getGroupId();
 	int iID = item.getItemId();
 
+	// Buses menu
 	if (gID == GBUSES) {
 	    switch(iID) {
 	    case MBUSES:
