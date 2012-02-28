@@ -280,9 +280,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	    // stopNetUpdate();
    	    debugArea.setText("No more rolling");
 	    break;
-
 	}
-
     }
 
     public void saveSettings(boolean clearOutstanding){
@@ -334,20 +332,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	// Choose a bus
 	SubMenu busMenu = menu.addSubMenu(GBUSES, MBUSES, 0, "Choose Bus");
 	busMenu.setIcon(android.R.drawable.ic_menu_mylocation);
-	// try {
-	//     JSONArray buslist = new JSONArray(busesJSON);
-	//     for (int x = 0; x < buslist.length(); x++ ) {
-	// 	try {
-	// 	    JSONObject bus = buslist.getJSONObject(x);
-	// 	    String name = bus.getString("name");
-	// 	    busMenu.add(GBUSES, x, x, name);
-	// 	} catch(JSONException e) {
-	// 	    Log.i("Error", "Bus list data broken");
-	// 	}
-	//     }
-	// } catch(Exception e) {
-	//     Log.i("Error", "Bus list broken");
-	// }
+
 
 	// Rest of the stuff....
 	MenuInflater inflater = getMenuInflater();
