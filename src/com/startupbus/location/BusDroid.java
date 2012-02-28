@@ -119,7 +119,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	settings = getSharedPreferences(PREFS_NAME, 0);
 	settingsEditor = settings.edit();
 
-	bus_id = settings.getInt("bus_id", 7);
+	bus_id = settings.getInt("bus_id", -1);
 	refresh_interval = settings.getInt("refresh_interval", 5);
 	remote_server = settings.getString("remote_server", "");
 	remote_config = settings.getString("remote_config", "");
@@ -265,6 +265,9 @@ public class BusDroid extends Activity implements OnClickListener {
     public void onClick(View src) {
 	switch (src.getId()) {
 	case R.id.buttonStart:
+	    if (bus_id < 0) {
+		break;
+	    }
 	    saveSettings(false);
 	    CheckEnableGPS();
 	    startGPS();
