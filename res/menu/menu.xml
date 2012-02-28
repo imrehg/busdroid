@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/bus_id_setting"
-          android:icon="@android:drawable/ic_menu_mylocation"
-          android:title="Bus ID" >
-      <menu>
-	<group android:checkableBehavior="single">
-	  <item android:id="@+id/bus_chicago_check"
-		android:title="Chicago" />
-	  <item android:id="@+id/bus_cleveland_check"
-		android:title="Cleveland" />
-	  <item android:id="@+id/bus_miami_check"
-		android:title="Miami" />
-	  <item android:id="@+id/bus_newyork_check"
-		android:title="New York" />
-	  <item android:id="@+id/bus_sanfrancisco_check"
-		android:title="San Francisco" />
-	  <item android:id="@+id/bus_siliconvalley_check"
-		android:title="Silicon Valley" />
-	  <item android:id="@+id/bus_europe_check"
-		android:title="Europe" />
-	</group>
-      </menu>
-    </item>
     <item android:id="@+id/refresh_setting"
           android:icon="@android:drawable/ic_menu_rotate"
           android:title="Refresh interval">

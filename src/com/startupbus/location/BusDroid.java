@@ -539,8 +539,6 @@ public class BusDroid extends Activity implements OnClickListener {
 
 	// Handle item selection
 	switch (item.getItemId()) {
-	case R.id.bus_id_setting:
-	    return true;
 	case R.id.refresh_setting:
 	    return true;
 
@@ -558,17 +556,6 @@ public class BusDroid extends Activity implements OnClickListener {
 	    return true;
 	case R.id.refresh_10:
 	    setRefreshInterval(10);
-	    toggleChecked(item);
-	    return true;
-
-	case R.id.bus_chicago_check:
-	case R.id.bus_cleveland_check:
-	case R.id.bus_miami_check:
-	case R.id.bus_newyork_check:
-	case R.id.bus_sanfrancisco_check:
-	case R.id.bus_siliconvalley_check:
-	case R.id.bus_europe_check:
-	    setBusID(city_map.get(item.getTitle()));
 	    toggleChecked(item);
 	    return true;
 
