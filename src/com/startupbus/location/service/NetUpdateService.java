@@ -158,6 +158,7 @@ public class NetUpdateService extends Service {
 	    }
 	    Log.i(tag, "Payload to send: " + payload.toString() + " => " + LocationServerURI);
 	    try {
+		String oauth_token = settings.getString("oauth_token", "");
 		postToServer(LocationServerURI, payload, oauth_token);
 		Log.i(tag, "Update run, JSON format");
 		prefedit.putString("outstanding_updates", "");
