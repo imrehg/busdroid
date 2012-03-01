@@ -100,8 +100,9 @@ public class NetUpdateService extends Service {
    // private static final String INSERT = "insert into " 
    //    + REMOTE_TABLE_NAME + "(bus_id, timestamp, longitude, latitude) values ('?', '?', '?', '?')";
 
-    public static void postToServer(String uri, JSONObject payload) throws Exception {
+    public static void postToServer(String uri, JSONObject payload, String oauth_token) throws Exception {
 	int TIMEOUT_MILLISEC = 10000;  // = 10 seconds
+	uri = uri + "?oauth_token=" + oauth_token;
 	HttpParams httpParams = new BasicHttpParams();
 	HttpConnectionParams.setConnectionTimeout(httpParams, TIMEOUT_MILLISEC);
 	HttpConnectionParams.setSoTimeout(httpParams, TIMEOUT_MILLISEC);
@@ -157,7 +158,7 @@ public class NetUpdateService extends Service {
 	    }
 	    Log.i(tag, "Payload to send: " + payload.toString() + " => " + LocationServerURI);
 	    try {
-		postToServer(LocationServerURI, payload);
+		postToServer(LocationServerURI, payload, oauth_token);
 		Log.i(tag, "Update run, JSON format");
 		prefedit.putString("outstanding_updates", "");
 		prefedit.putLong("last_update_sent", (long) System.currentTimeMillis()/1000L);

@@ -108,6 +108,7 @@ public class BusDroid extends Activity implements OnClickListener {
 
     private JSONArray buses;
     private String busesJSON;
+    private String oauth_token;
 
     /* Called when the activity is first created. */
     @Override
@@ -124,6 +125,7 @@ public class BusDroid extends Activity implements OnClickListener {
 	remote_server = settings.getString("remote_server", "");
 	remote_config = settings.getString("remote_config", "");
 	busesJSON = settings.getString("busesJSON", "[]");
+	oauth_token = settings.getString("oauth_token", "");
 
 	buttonStart = (Button) findViewById(R.id.buttonStart);
 	buttonStop = (Button) findViewById(R.id.buttonStop);
@@ -313,6 +315,8 @@ public class BusDroid extends Activity implements OnClickListener {
 
 	settingsEditor.putString("busesJSON", busesJSON);
 
+	settingsEditor.putString("oauth_token", oauth_token);
+
 	// Commit the edits!
 	settingsEditor.commit();
 	push_location_view.setText(remote_server);
@@ -447,6 +451,7 @@ public class BusDroid extends Activity implements OnClickListener {
 			buses = object.getJSONArray("buses");
 			busesJSON = object.getJSONArray("buses").toString();
 			remote_server = object.getString("endpoint");
+			oauth_token = object.getString("oauth_token");
 			saveSettings(true);
 			restartGPS();
 			makeToast("Configuration update successful.");
