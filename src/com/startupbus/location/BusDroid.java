@@ -103,6 +103,7 @@ public class BusDroid extends Activity implements OnClickListener {
     private static final int MBUSES = 5001;
     private static final int MINTERVAL = 5002;
     private static final int MENDPOINT = 5003;
+    private static final int MOAUTH = 5004;
 
     private static final int GBUSES = 1;
 
@@ -341,6 +342,10 @@ public class BusDroid extends Activity implements OnClickListener {
 	SubMenu busMenu = menu.addSubMenu(GBUSES, MBUSES, 0, "Choose Bus");
 	busMenu.setIcon(android.R.drawable.ic_menu_mylocation);
 
+	// Choose a bus
+	SubMenu oauthMenu = menu.addSubMenu(0, MOAUTH, 0, "OAuth Token");
+	oauthMenu.setIcon(android.R.drawable.ic_lock_lock);
+
 
 	// Rest of the stuff....
 	MenuInflater inflater = getMenuInflater();
@@ -451,7 +456,6 @@ public class BusDroid extends Activity implements OnClickListener {
 			buses = object.getJSONArray("buses");
 			busesJSON = object.getJSONArray("buses").toString();
 			remote_server = object.getString("endpoint");
-			oauth_token = object.getString("oauth_token");
 			saveSettings(true);
 			restartGPS();
 			makeToast("Configuration update successful.");
@@ -494,6 +498,34 @@ public class BusDroid extends Activity implements OnClickListener {
 	    });
 
 	alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    // Canceled.
+		}
+	    });
+
+	alert.show();
+    }
+
+    public void set_oauth_token_dialog() {
+	AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+	alert.setTitle("OAuth Token");
+	alert.setMessage("Enter your token for great good:");
+
+	// Set an EditText view to get user input 
+        final EditText input = new EditText(this);
+	alert.setView(input);
+
+	input.setText(oauth_token);
+
+	alert.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		    oauth_token = input.getText().toString();
+		    saveSettings(true);
+		}
+	    });
+
+	alert.setNegativeButton("Back", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
 		    // Canceled.
 		}
@@ -560,6 +592,9 @@ public class BusDroid extends Activity implements OnClickListener {
 	    return true;
 	case MCONFIG:
 	    get_remote_config_dialog();
+	    return true;
+	case MOAUTH:
+	    set_oauth_token_dialog();
 	    return true;
 
 	default:
