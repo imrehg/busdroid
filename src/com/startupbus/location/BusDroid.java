@@ -72,6 +72,10 @@ import android.view.SubMenu;
 import android.widget.Toast;
 import android.app.ProgressDialog;
 
+import android.os.AsyncTask;
+import java.net.URL;
+import java.net.MalformedURLException;
+
 public class BusDroid extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "BusdroidPrefs";
     private static final String tag = "BusDroid:Main";
@@ -447,23 +451,15 @@ public class BusDroid extends Activity implements OnClickListener {
 
 	alert.setPositiveButton("Get config", new DialogInterface.OnClickListener() {
 		public void onClick(DialogInterface dialog, int whichButton) {
+		    URL remote_config_url;
 		    remote_config = input.getText().toString();
 		    try {
-			String remotedata = getStringContent(remote_config);
-			Log.i("DATA", remotedata);
-			JSONObject object = (JSONObject) new JSONTokener(remotedata).nextValue();
-			// Save settings
-			buses = object.getJSONArray("buses");
-			busesJSON = object.getJSONArray("buses").toString();
-			remote_server = object.getString("endpoint");
-			saveSettings(true);
-			restartGPS();
-			makeToast("Configuration update successful.");
-		    } catch (Exception e) {
-			makeToast("Something went wrong, please check your network connection and the URL you gave.");
-			Log.i("Remote config error:", e.toString());
-		    } finally {
+			remote_config_url = new URL(remote_config);
+		    } catch (MalformedURLException e) {
+			makeToast("Something wrong with this URL: "+remote_config);
+			return;
 		    }
+		    new DownloadConfiguration().execute(remote_config_url);
 		}
 	    });
 
@@ -475,6 +471,39 @@ public class BusDroid extends Activity implements OnClickListener {
 
 	alert.show();
     }
+
+    private class DownloadConfiguration extends AsyncTask<URL, Void, String> {
+
+	protected String doInBackground(URL... url) {
+	    String remotedata = "";
+	    try {
+		remotedata = getStringContent(url[0].toString());
+		Log.i("DATA", remotedata);
+	    } catch (Exception e) {
+		makeToast("Something went wrong, please check your network connection and the URL you gave.");
+		Log.i("Remote config error:", e.toString());
+	    }
+	    return remotedata;
+	}
+
+	protected void onPostExecute(String remotedata) {
+	    if (remotedata != "") {
+		JSONObject object;
+		try {
+		    object = (JSONObject) new JSONTokener(remotedata).nextValue();
+		    buses = object.getJSONArray("buses");
+		    busesJSON = object.getJSONArray("buses").toString();
+		    remote_server = object.getString("endpoint");
+		} catch (JSONException e) {
+		    return;
+		}
+		saveSettings(true);
+		restartGPS();
+		makeToast("Configuration update successfully.");
+	    }
+	}
+    }
+
 
     public void set_location_dialog() {
 	AlertDialog.Builder alert = new AlertDialog.Builder(this);
